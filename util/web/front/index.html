@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LLM 4 Cloud</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/mini.css/3.0.1/mini-default.min.css">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12 center">
+                <h1>LLM 4 Cloud<small>Évaluation des capacités des LLM dans la génération de fichiers de configuration pour le Cloud</small></h1>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12 center">
+                <div class="card fluid">
+                    <h2>Présentation</h2>
+                    <hr/>
+                    <p>
+                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+                    </p>
+                    <p>LLM testés : <mark>Phi-4 (14b)</mark> <mark>DeepSeek-R1 (7b)</mark></p>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6 col-sm-12 center">
+                <div class="card fluid">
+                    <h2>Résultats</h2>
+                    <hr/>
+                    <div class="button-group">
+                        <button id="taux" class="primary">Taux (%)</button>
+                        <button id="nombre">Nombre</button>
+                    </div>
+                    <div class="button-group">
+                        <button id="toutes-difficultes" class="primary">Toutes difficultés confondues</button>
+                        <button id="difficulte-1">Difficulté 1</button>
+                        <button id="difficulte-2">Difficulté 2</button>
+                    </div>
+                    <div class="button-group">
+                        <button id="variante-all" class="primary">
+                            Toutes variantes confondues
+                        </button>
+                        <button id="variante-en">
+                            Variante EN
+                        </button>
+                        <button id="variante-fr">
+                            Variante FR
+                        </button>
+                        <button id="variante-short">
+                            Variante Short
+                        </button>
+                    </div>
+                    <canvas id="resultats"></canvas>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-sm-12 center">
+                <div class="card fluid">
+                    <h2>En détail</h2>
+                    <hr/>
+                    <iframe src="LLM4Cloud.pdf"></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+    <footer>
+        <p>
+            Par <a href="https://www.linkedin.com/in/adam-ouzegdouh-9342742a1" target="_blank">Adam OUZEGDOUH</a> et <a href="https://www.linkedin.com/in/laurent-dessartre-pierre/" target="_blank">Pierre LAURENT</a>
+        </p>
+        <p>
+            Basé sur le benchmark <a href="https://www.cs-pk.com/neurips24-iac-eval.pdf" target="_blank"><b>IaC-Eval</b></a> de l'<a href="https://umich.edu/" target="_blank">Université du Michigan</a> et de <a href="https://research.cisco.com/" target="_blank">Cisco Research</a> 
+        </p>
+        <a href="https://www.telecom-sudparis.eu/" target="_blank">
+            <img src="img/tsp.png" id="logo">
+        </a>
+    </footer>
+    <script src="script.js"></script>
+</body>
+</html>

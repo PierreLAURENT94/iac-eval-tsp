@@ -1,0 +1,74 @@
+[
+  {
+    "llm": "Phi-4 (14B)",
+    "difficulty": "1",
+    "variant": "en",
+    "correct": true
+  },
+  {
+    "llm": "Phi-4 (14B)",
+    "difficulty": "2",
+    "variant": "en",
+    "correct": true
+  },
+  {
+    "llm": "Phi-4 (14B)",
+    "difficulty": "1",
+    "variant": "short",
+    "correct": true
+  },
+  {
+    "llm": "Phi-4 (14B)",
+    "difficulty": "2",
+    "variant": "short",
+    "correct": false
+  },
+  {
+    "llm": "Phi-4 (14B)",
+    "difficulty": "1",
+    "variant": "fr",
+    "correct": true
+  },
+  {
+    "llm": "Phi-4 (14B)",
+    "difficulty": "2",
+    "variant": "fr",
+    "correct": false
+  },
+  {
+    "llm": "DeepSeek-R1 (7B)",
+    "difficulty": "1",
+    "variant": "en",
+    "correct": true
+  },
+  {
+    "llm": "DeepSeek-R1 (7B)",
+    "difficulty": "2",
+    "variant": "en",
+    "correct": false
+  },
+  {
+    "llm": "DeepSeek-R1 (7B)",
+    "difficulty": "1",
+    "variant": "short",
+    "correct": false
+  },
+  {
+    "llm": "DeepSeek-R1 (7B)",
+    "difficulty": "2",
+    "variant": "short",
+    "correct": false
+  },
+  {
+    "llm": "DeepSeek-R1 (7B)",
+    "difficulty": "1",
+    "variant": "fr",
+    "correct": false
+  },
+  {
+    "llm": "DeepSeek-R1 (7B)",
+    "difficulty": "2",
+    "variant": "fr",
+    "correct": false
+  }
+]
