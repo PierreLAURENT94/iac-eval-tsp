@@ -336,3 +336,25 @@ def gemini(preprompt, prompt):
 # print(Magicoder_S_CL_7B("You are TerraformAI, an AI agent that builds and deploys Cloud Infrastructure written in Terraform HCL. Generate a description of the Terraform program you will define, followed by a single Terraform HCL program in response to each of my Instructions. Make sure the configuration is deployable. Create IAM roles as needed. If variables are used, make sure default values are supplied.", "Here is the actual prompt: Create an AWS VPC resource with an Internet Gateway attached to it"))
 
 # print(Wizardcoder34b("You are TerraformAI, an AI agent that builds and deploys Cloud Infrastructure written in Terraform HCL. Generate a description of the Terraform program you will define, followed by a single Terraform HCL program in response to each of my Instructions. Make sure the configuration is deployable. Create IAM roles as needed. If variables are used, make sure default values are supplied.", "Here is the actual prompt: Create an AWS VPC resource with an Internet Gateway attached to it"))
+
+def Ollama(preprompt, prompt, model):
+    for i in range(2):
+        try:
+            response = requests.post(
+                "http://localhost:11434/api/generate",
+                json={
+                    "model": model,
+                    "prompt": prompt,
+                    "system": preprompt,
+                    "stream": False
+                }
+            )
+            output_string = response.json().get("response")
+            print(output_string)
+            return output_string
+        except Exception as e:
+            s = str(e)
+            print(s)
+            if "status: 502" in s or "Prediction interrupted" in s:
+                time.sleep(10)
+    return ""

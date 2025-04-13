@@ -525,6 +525,9 @@ def model_evaluation(
                 text = models.Wizardcoder33b(preprompt, prompt)
             elif model == "Wizardcoder34b":
                 text = models.Wizardcoder34b(preprompt, prompt)
+            elif model.startswith("Ollama-"):
+                model_name = model.split("-", 1)[1]
+                text = models.Ollama(preprompt, prompt, model_name)
 
             logger.info(f"Model raw output: {text}")
 
