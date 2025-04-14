@@ -1,0 +1,3342 @@
+Resource,Prompt,Rego intent,Difficulty,Reference output,Intent
+"aws_route53_record, aws_route53_zone",Set up a record that maps a domain name to an IPv4 address using Route 53 resources,"package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_route53_record""
+    r.change.after.type == ""A""
+}",2,"provider ""aws"" {
+  region = ""us-east-1""
+}
+
+resource ""aws_route53_zone"" ""example53"" {
+  name = ""example53.com""
+}
+
+resource ""aws_route53_record"" ""example53_A"" {
+  zone_id = aws_route53_zone.example53.zone_id
+  name    = ""example53.com""
+  type    = ""A""
+  ttl     = ""300""
+  records = [""192.0.2.1""]  
+}","Has one ""aws_route53_zone"" resource
+    with ""name"" set to ""example53.com""
+
+Has one ""aws_route53_record"" resource
+    with ""name""
+    with ""type"" set to ""A""
+    with ""ttl""
+    with ""records""
+    with ""zone_id"" referencing the ""aws_route53_zone"" resource
+"
+"aws_route53_record, aws_route53_zone",Set up a record that maps a domain name to an IPv6 address using Route 53 resources,"package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_route53_record""
+    r.change.after.type == ""A""
+}",2,"provider ""aws"" {
+  region = ""us-east-1""
+}
+
+resource ""aws_route53_zone"" ""example53"" {
+  name = ""example53.com""
+}
+
+resource ""aws_route53_record"" ""example53_A"" {
+  zone_id = aws_route53_zone.example53.zone_id
+  name    = ""example53.com""
+  type    = ""AAAA""
+  ttl     = ""300""
+  records = [""2001:0db8:85a3:0000:0000:8a2e:0370:7334""]  
+}","Has one ""aws_route53_zone"" resource
+    with ""name"" set to ""example53.com""
+
+Has one ""aws_route53_record"" resource
+    with ""name""
+    with ""type"" set to ""AAAA""
+    with ""ttl""
+    with ""records""
+    with ""zone_id"" referencing the ""aws_route53_zone"" resource
+"
+"aws_route53_record, aws_route53_zone","Set up a Pointer record for reverse DNS using Route 53 resources. The domain name should be ""host.example53.com"" and name the zone ""reverse_zone""","package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_route53_record""
+    r.change.after.type == ""PTR""
+}",2,"provider ""aws"" {
+  region = ""us-east-1""
+}
+
+# Create Reverse DNS Hosted Zone
+resource ""aws_route53_zone"" ""reverse_zone"" {
+  name = ""2.0.192.in-addr.arpa""
+}
+
+# Create a PTR Record for a specific IP address within that zone
+resource ""aws_route53_record"" ""ptr_record"" {
+  zone_id = aws_route53_zone.reverse_zone.zone_id
+  name    = ""53.2.0.192.in-addr.arpa""
+  type    = ""PTR""
+  ttl     = ""3600""
+  records = [""host.example.com""]
+}","Has one ""aws_route53_zone"" resource
+    with ""name"" ending in "".in-addr.arpa""
+
+Has one ""aws_route53_record"" resource
+    with ""name""
+    with ""type"" set to ""PTR""
+    with ""ttl""
+    with ""records""
+    with ""zone_id"" referencing the ""aws_route53_zone"" resource
+"
+"aws_route53_record, aws_route53_zone","Set up a TXT recordfor domain ownership verification purposes using Route 53 resources. The verification string should be ""passwordpassword"" and the name of the zone should be ""example""","package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_route53_record""
+    r.change.after.type == ""TXT""
+}",2,"provider ""aws"" {
+  region = ""us-east-1""
+}
+
+resource ""aws_route53_zone"" ""example"" {
+  name = ""example53.com""
+}
+
+# TXT Record for domain verification or other purposes
+resource ""aws_route53_record"" ""example_txt"" {
+  zone_id = aws_route53_zone.example.zone_id
+  name    = ""sub.example53.com""
+  type    = ""TXT""
+  ttl     = ""300""
+  records = [""passwordpassword""] 
+}","Has one ""aws_route53_zone"" resource
+    with ""name"" set to ""example53.com""
+
+Has one ""aws_route53_record"" resource
+    with ""name""
+    with ""type"" set to ""TXT""
+    with ""ttl""
+    with ""records"" set to a string
+    with ""zone_id"" referencing the ""aws_route53_zone"" resource
+"
+"aws_elastic_beanstalk_application, aws_elastic_beanstalk_configuration_template",Create a template of an elastic beanstalk application,"package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_elastic_beanstalk_application""
+}",2,"provider ""aws"" {
+  region = ""us-east-1""
+}
+
+resource ""aws_elastic_beanstalk_application"" ""tftest"" {
+  name        = ""tf-test-name""
+  description = ""tf-test-desc""
+}
+
+resource ""aws_elastic_beanstalk_configuration_template"" ""tf_template"" {
+  name                = ""tf-test-template-config""
+  application         = aws_elastic_beanstalk_application.tftest.name
+  solution_stack_name = ""64bit Amazon Linux 2023 v4.0.9 running Python 3.11""
+}","Has one ""aws_elastic_beanstalk_application"" resource
+    with ""name""
+
+Has one ""aws_elastic_beanstalk_configuration_template"" resource
+    with ""name""
+    with ""application"" referencing the ""aws_elastic_beanstalk_application"" resource
+    with ""solution_stack_name"" "
+"aws_elastic_beanstalk_application, aws_elastic_beanstalk_configuration_template",Create a template of an elastic beanstalk application that is running a version of Go,"package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_elastic_beanstalk_application""
+}",2,"provider ""aws"" {
+  region = ""us-east-1""
+}
+
+resource ""aws_elastic_beanstalk_application"" ""tftest"" {
+  name        = ""tf-test-name""
+  description = ""tf-test-desc""
+}
+
+resource ""aws_elastic_beanstalk_configuration_template"" ""tf_template"" {
+  name                = ""tf-test-template-config""
+  application         = aws_elastic_beanstalk_application.tftest.name
+  solution_stack_name = ""64bit Amazon Linux 2 v3.10.1 running Go 1""
+}","Has one ""aws_elastic_beanstalk_application"" resource
+    with ""name""
+
+Has one ""aws_elastic_beanstalk_configuration_template"" resource
+    with ""name""
+    with ""application"" referencing the ""aws_elastic_beanstalk_application"" resource
+    with ""solution_stack_name"" that references a valid ""Go"" version"
+aws_elastic_beanstalk_application,Provision a resource to deploy and scale a web application that was developed with supported programming languages.,"package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_elastic_beanstalk_application""
+}",1,"provider ""aws"" {
+  region = ""us-east-1""
+}
+
+resource ""aws_elastic_beanstalk_application"" ""tftest"" {
+  name        = ""tf-test-name""
+  description = ""tf-test-desc""
+}","Has one ""aws_elastic_beanstalk_application"" resource
+    with ""name"""
+aws_kinesis_stream,Generate a basic Amazon Kinesis stream,"package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_kinesis_stream""
+}",2,"provider ""aws"" {
+  region = ""us-west-2""
+}
+
+resource ""aws_kinesis_stream"" ""test_stream"" {
+  name             = ""drow1""
+  shard_count      = 1
+  retention_period = 48
+
+  shard_level_metrics = [
+    ""IncomingBytes"",
+    ""OutgoingBytes"",
+  ]
+
+  stream_mode_details {
+    stream_mode = ""PROVISIONED""
+  }
+
+  tags = {
+    Environment = ""test""
+  }
+}","Has one ""aws_kinesis_stream"" resource"
+aws_kinesis_video_stream,Generate a basic Kinesis Video Stream resource,"package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_kinesis_video_stream""
+}",2,"provider ""aws"" {
+  region = ""us-east-1""
+}
+
+resource ""aws_kinesis_video_stream"" ""default"" {
+  name                    = ""terraform-kinesis-video-stream""
+  data_retention_in_hours = 1
+  device_name             = ""kinesis-video-device-name""
+  media_type              = ""video/h264""
+
+  tags = {
+    Name = ""terraform-kinesis-video-stream""
+  }
+}","Has one ""aws_kinesis_video_stream"" resource"
+"aws_kinesis_stream, aws_kinesis_stream_consumer",Generate a resource to manage a Kinesis Stream Consumer,"package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_kinesis_stream""
+}",2,"provider ""aws"" {
+  region = ""us-west-2""
+}
+
+resource ""aws_kinesis_stream"" ""example"" {
+  name        = ""example-stream""
+  shard_count = 1
+}
+
+resource ""aws_kinesis_stream_consumer"" ""example"" {
+  name       = ""example-consumer""
+  stream_arn = aws_kinesis_stream.example.arn
+}","Has one ""aws_kinesis_stream"" resource and one ""aws_kinesis_stream_consumer"" resource"
+aws_kinesis_analytics_application,Generate a basic Amazon Kinesis Analytics Application,"package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_kinesis_analytics_application""
+}",1,"provider ""aws"" {
+  region = ""us-west-2""
+}
+
+resource ""aws_kinesis_analytics_application"" ""test_application"" {
+  name = ""kinesis-analytics-application-test""
+}","Has one ""aws_kinesis_analytics_application"" resource"
+aws_route53_zone,"Set up an aws_route_53 zone named ""example53.com""","package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_route53_zone""
+}",1,"provider ""aws"" {
+  region = ""us-east-1""
+}
+
+resource ""aws_route53_zone"" ""primary"" {
+  name = ""example53.com""
+}","Has one ""aws_route53_zone"" resource
+    with ""name"" set to ""example53.com"""
+"aws_route53_record, aws_route53_zone","Set up a non-alias aws_route_53 record that is linked to an aws_route53_zone resource named ""example53.com""","package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_route53_zone""
+}",2,"provider ""aws"" {
+  region = ""us-east-1""
+}
+
+resource ""aws_route53_zone"" ""example53"" {
+  name = ""example53.com""
+}
+
+resource ""aws_route53_record"" ""example53_A"" {
+  zone_id = aws_route53_zone.example53.zone_id
+  name    = ""example53.com""
+  type    = ""A""
+  ttl     = ""300""
+  records = [""192.0.2.1""]  
+}","Has one ""aws_route53_zone"" resource
+    with ""name"" set to ""example53.com""
+
+Has one ""aws_route53_record"" resource
+    with ""name""
+    with ""type""
+    with ""ttl""
+    with ""records""
+    with ""zone_id"" referencing the ""aws_route53_zone"" resource
+"
+"aws_s3_bucket, aws_s3_bucket_metric, aws_s3_bucket_object","Set up an AWS S3 bucket named 'my_bucket' with forced destruction enabled for cleanup purposes. Create an S3 bucket metric named 'my_bucket_metric' to monitor the entire bucket's activity. Additionally, include an S3 bucket object named 'my_object' with a specific key and content to be stored in the bucket.","package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_s3_bucket""
+}",2,"provider ""aws"" {
+    region = ""us-west-1""
+}
+
+resource ""aws_s3_bucket"" ""test"" {
+  bucket        = ""metricbeat-test-bucket""
+  force_destroy = true // Required for cleanup
+}
+
+resource ""aws_s3_bucket_metric"" ""test"" {
+  bucket = aws_s3_bucket.test.id
+  name   = ""EntireBucket""
+}
+
+resource ""aws_s3_bucket_object"" ""test"" {
+  key     = ""someobject""
+  bucket  = aws_s3_bucket.test.id
+  content = ""something""
+}","has one ""aws_s3_bucket"" resource
+    with one ""bucket""
+
+has one ""aws_s3_bucket_metric""
+    with one ""bucket""
+    with one ""name
+
+has one ""aws_s3_bucket_object""
+    with one ""bucket""
+    with one ""key""
+"
+"aws_s3_bucket, aws_s3_bucket_versioning","Create a bucket ""sample"". Implement versioning resource for the AWS S3 bucket named 'sample' with the versioning status set to 'Enabled' and specify the expected_bucket_owner as '123456789012' to ensure ownership consistency.","package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_s3_bucket""
+}",2,"provider ""aws"" {
+    region = ""us-west-1""
+}
+
+resource ""aws_s3_bucket"" ""sample"" {
+  bucket = ""sample""
+}
+
+resource ""aws_s3_bucket_versioning"" ""sample"" {
+  bucket = ""sample""
+  versioning_configuration {
+    status = ""Enabled""
+  }
+  expected_bucket_owner = ""123456789012""
+}","has one aws_s3_bucket resource
+with bucket
+
+has one ""aws_s3_bucket_versioning"" resource
+     with bucket
+     with versionaning_configuration
+          with status"
+"aws_s3_bucket, aws_s3_bucket_logging","Create a bucket ""a"". Then configure logging for the bucket to send access logs to another bucket named 'logging-680235478471' with a prefix of 'log/' in the target bucket.","package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_s3_bucket""
+}",2,"provider ""aws"" {
+    region = ""us-west-1""
+}
+
+resource ""aws_s3_bucket"" ""a"" {
+  bucket = ""testbucketineu-west2""
+}
+
+resource ""aws_s3_bucket_logging"" ""example"" {
+  bucket        = ""testbucketineu-west2""
+  target_bucket = ""logging-680235478471""
+  target_prefix = ""log/""
+}","has one aws_s3_bucket resource
+with bucket
+
+has one aws_s3_bucket_logging resource
+with bucket
+with target_bucket
+with target_prefix"
+"aws_s3_bucket, aws_s3_bucket_object_lock_configuration",Create an AWS S3 bucket named 'example-bucket' with object lock enabled. Configure object lock governance mode with a retention period of 90 days for objects in the bucket.,"package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_s3_bucket""
+}",2,"provider ""aws"" {
+    region = ""us-west-1""
+}
+
+resource ""aws_s3_bucket"" ""example"" {
+  bucket = ""example-bucket""
+}
+
+resource ""aws_s3_bucket_object_lock_configuration"" ""example"" {
+  bucket = aws_s3_bucket.example.bucket
+
+  rule {
+    default_retention {
+      mode  = ""GOVERNANCE""
+      days  = 90
+    }
+  }
+}","has one aws_s3_bucket resource
+with bucket
+
+has one aws_s3_bucket_object_lock_configuration resource
+with bucket
+with rule
+     with default_retention
+          with mode (GOVERNANCE or COMPLIANCE)
+          with days or years"
+"aws_s3_bucket, aws_s3_bucket_object_lock_configuration",Create an AWS S3 bucket named 'example-bucket' with object lock enabled. Configure object lock compliance mode with a retention period of 30 days for objects in the bucket.,"package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_s3_bucket""
+}",2,"provider ""aws"" {
+    region = ""us-west-1""
+}
+
+resource ""aws_s3_bucket"" ""example"" {
+  bucket = ""example-bucket""
+}
+
+resource ""aws_s3_bucket_object_lock_configuration"" ""example"" {
+  bucket = aws_s3_bucket.example.bucket
+
+  rule {
+    default_retention {
+      mode  = ""COMPLIANCE""
+      days  = 30
+    }
+  }
+}","has one aws_s3_bucket resource
+with bucket
+
+has one aws_s3_bucket_object_lock_configuration resource
+with bucket
+with rule
+     with default_retention
+          with mode (GOVERNANCE or COMPLIANCE)
+          with days or years"
+"aws_s3_bucket, aws_s3_bucket_request_payment_configuration","create a bucket 'pike-680235478471'. Set up request payment configuration for an AWS S3 bucket named 'pike-680235478471', specifying the payer as 'Requester'.","package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_s3_bucket""
+}",2,"provider ""aws"" {
+    region = ""us-west-1""
+}
+
+resource ""aws_s3_bucket"" ""a"" {
+  bucket = ""pike-680235478471""
+}
+
+resource ""aws_s3_bucket_request_payment_configuration"" ""pike"" {
+  bucket = ""pike-680235478471""
+  payer  = ""Requester""
+}","has one aws_s3_bucket resource
+with bucket
+
+has one aws_s3_bucket_request_payment_configuration resource
+with bucket
+with payer (BucketOwner or Requester)"
+"aws_s3_bucket, aws_s3_bucket_public_access_block","Implement public access block settings for an AWS S3 bucket named 'pike-680235478471' to block public ACLs, public policies, and restrict public buckets.","package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_s3_bucket""
+}",2,"provider ""aws"" {
+    region = ""us-west-1""
+}
+
+resource ""aws_s3_bucket"" ""a"" {
+  bucket = ""pike-680235478471""
+}
+
+resource ""aws_s3_bucket_public_access_block"" ""example"" {
+  bucket = ""pike-680235478471""
+
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}","has one aws_s3_bucket resource
+with bucket
+
+has one aws_s3_bucket_public_access_block resource
+with bucket
+with block_public_acls (boolean)
+with block_public_policy (boolean)
+with ignore_public_acls (boolean)
+with restrict_public_buckets (boolean)"
+"aws_kms_key, aws_s3_bucket, aws_s3_bucket_server_side_encryption_configuration","Create a Terraform configuration for an AWS environment. Start by defining a KMS key with a specific description and a set deletion window in days. Next, define an S3 bucket with a specified name. Finally, configure server-side encryption for the S3 bucket using the previously defined KMS key. The encryption should use the KMS algorithm specified in AWS. Include resource blocks for each component and ensure the bucket encryption references the KMS key's ARN and uses the KMS algorithm for encryption.","package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_kms_key""
+}",2,"provider ""aws"" {
+    region = ""us-west-1""
+}
+
+resource ""aws_kms_key"" ""mykey"" {
+  description             = ""This key is used to encrypt bucket objects""
+  deletion_window_in_days = 10
+}
+
+resource ""aws_s3_bucket"" ""mybucket"" {
+  bucket = ""mybucket""
+}
+
+resource ""aws_s3_bucket_server_side_encryption_configuration"" ""example"" {
+  bucket = aws_s3_bucket.mybucket.id
+
+  rule {
+    apply_server_side_encryption_by_default {
+      kms_master_key_id = aws_kms_key.mykey.arn
+      sse_algorithm     = ""aws:kms""
+    }
+  }
+}","Resource ""aws_kms_key""
+has one ""description""
+has one ""deletion_window_in_days""
+
+Resource ""aws_s3_bucket""
+has one ""bucket""
+
+Resource ""aws_s3_bucket_server_side_encryption_configuration""
+has one ""bucket""
+within ""rule"", it specifies:
+""kms_master_key_id""
+""sse_algorithm"""
+"aws_s3_bucket, aws_s3_bucket_acl, aws_s3_bucket_ownership_controls","Generate a Terraform configuration for managing AWS S3 resources. Start by creating an S3 bucket with a specific name. Follow this with a configuration block for S3 bucket ownership controls, referencing the bucket's ID and setting the object ownership policy to a predefined setting. Then, define an S3 bucket ACL resource that depends on the successful application of the ownership controls. This ACL should set the bucket access to private and also reference the bucket's ID. Ensure each resource block is defined clearly and connected appropriately through references.","package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_s3_bucket""
+}",2,"provider ""aws"" {
+    region = ""us-west-1""
+}
+
+resource ""aws_s3_bucket"" ""example"" {
+  bucket = ""my-tf-example-bucket""
+}
+
+resource ""aws_s3_bucket_ownership_controls"" ""example"" {
+  bucket = aws_s3_bucket.example.id
+  rule {
+    object_ownership = ""BucketOwnerPreferred""
+  }
+}
+
+resource ""aws_s3_bucket_acl"" ""example"" {
+  depends_on = [aws_s3_bucket_ownership_controls.example]
+
+  bucket = aws_s3_bucket.example.id
+  acl    = ""private""
+}","Resource ""aws_s3_bucket""
+has one ""bucket""
+
+Resource ""aws_s3_bucket_ownership_controls""
+has one ""bucket""
+within ""rule"", it specifies:
+""object_ownership""
+
+Resource ""aws_s3_bucket_acl""
+has a dependency on ""aws_s3_bucket_ownership_controls.example""
+has one ""bucket""
+has one ""acl""
+"
+aws_s3_bucket_object,"Craft a Terraform configuration for creating an AWS S3 bucket object. Define an S3 bucket object (with value ""object"") with specific attributes including the bucket name (with value ""your_bucket_name""), object key (with value ""new_object_key""), and the path to the source file (with value ""path/to/file""). ","package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_s3_bucket_object""
+}",1,"provider ""aws"" {
+    region = ""us-west-1""
+}
+
+resource ""aws_s3_bucket_object"" ""object"" {
+  bucket = ""your_bucket_name""
+  key    = ""new_object_key""
+  source = ""path/to/file""
+}","Resource ""aws_s3_bucket_object""
+has one ""bucket""
+has one ""key""
+has one ""source""
+has one ""etag"""
+"aws_s3_bucket, aws_s3_bucket_ownership_controls","Generate a Terraform configuration for creating an AWS S3 bucket and setting its ownership controls. Define a resource for an S3 bucket with a specified name. Follow this by configuring ownership controls for this bucket, referencing its ID. Within the ownership controls, set a rule to specify the object ownership as 'BucketOwnerPreferred'. Ensure that the resources are properly linked using references, and the configuration is clearly laid out to reflect these settings.","package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_s3_bucket""
+}",2,"provider ""aws"" {
+    region = ""us-west-1""
+}
+
+resource ""aws_s3_bucket"" ""example"" {
+  bucket = ""example""
+}
+
+resource ""aws_s3_bucket_ownership_controls"" ""example"" {
+  bucket = aws_s3_bucket.example.id
+
+  rule {
+    object_ownership = ""BucketOwnerPreferred""
+  }
+}","Resource ""aws_s3_bucket"" 
+has one ""bucket""
+
+Resource ""aws_s3_bucket_ownership_controls""
+has one ""bucket""
+within the ""rule"", it specifies:
+""object_ownership"""
+aws_ami,Create an AWS aws_ami resource for the latest Amazon Linux 2 AMI,"package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_ami""
+}",2,"provider ""aws"" {
+  region = ""us-east-1""
+}
+
+data ""aws_ami"" ""latest_amazon_linux_2"" {
+  most_recent = true
+  owners      = [""amazon""]
+
+  filter {
+    name   = ""name""
+    values = [""amzn2-ami-hvm-*-x86_64-gp2""]
+  }
+}",create aws_ami resource with name = any
+aws_ami,Create an AWS aws_ami for the latest Amazon Linux 2 AMI,"package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_ami""
+}",2,"provider ""aws"" {
+  region = ""us-east-1""
+}
+
+data ""aws_ami"" ""latest_amazon_linux_2"" {
+  most_recent = true
+  owners      = [""amazon""]
+
+  filter {
+    name   = ""name""
+    values = [""amzn2-ami-hvm-*-x86_64-gp2""]
+  }
+}",create aws_ami resource with name = any
+aws_elasticache_cluster,Provide a Memcached Cluster,"package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_elasticache_cluster""
+}",2,"provider ""aws"" {
+  region=""us-east-1""
+}
+resource ""aws_elasticache_cluster"" ""example"" {
+  cluster_id           = ""cluster-example""
+  engine               = ""memcached""
+  node_type            = ""cache.m4.large""
+  num_cache_nodes      = 2
+  parameter_group_name = ""default.memcached1.4""
+  port                 = 11211
+}","requires cluster id, engine=memcached, node_type, num_cache_nodes, parameter_group_name"
+aws_elasticache_cluster,Provide a Redis Instance,"package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_elasticache_cluster""
+}",1,"resource ""aws_elasticache_cluster"" ""example"" {
+  cluster_id           = ""cluster-example""
+  engine               = ""redis""
+  node_type            = ""cache.m4.large""
+  num_cache_nodes      = 1
+  parameter_group_name = ""default.redis3.2""
+  engine_version       = ""3.2.10""
+  port                 = 6379
+}","requires cluster id, engine=redis, node_type, num_cache_nodes, parameter_group_name"
+aws_elasticache_user,Provide an ElastiCache user resource with redis,"package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_elasticache_user""
+}",1,"resource ""aws_elasticache_user"" ""test"" {
+  user_id       = ""testUserId""
+  user_name     = ""testUserName""
+  access_string = ""on ~app::* -@all +@read +@hash +@bitmap +@geo -setbit -bitfield -hset -hsetnx -hmset -hincrby -hincrbyfloat -hdel -bitop -geoadd -georadius -georadiusbymember""
+  engine        = ""REDIS""
+  passwords     = [""password123456789""]
+}","requires access string, engine = REDIS, user id and user name"
+aws_elasticache_user,Provide an ElastiCache user resource with iam,"package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_elasticache_user""
+}",1,"resource ""aws_elasticache_user"" ""test"" {
+  user_id       = ""testUserId""
+  user_name     = ""testUserName""
+  access_string = ""on ~* +@all""
+  engine        = ""REDIS""
+
+  authentication_mode {
+    type = ""iam""
+  }
+}","requires access string, engine = REDIS, user id and user name, authentication_mode {type = ""iam""}"
+aws_elasticache_user,Provide an ElastiCache user resource with password.,"package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_elasticache_user""
+}",2,"resource ""aws_elasticache_user"" ""test"" {
+  user_id       = ""testUserId""
+  user_name     = ""testUserName""
+  access_string = ""on ~* +@all""
+  engine        = ""REDIS""
+
+  authentication_mode {
+    type      = ""password""
+    passwords = [""password1"", ""password2""]
+  }
+}","requires access string, engine = REDIS, user id and user name, authentication_mode {type= ""password"", passwords = [""password1"", ""password2""]}"
+"aws_elasticache_user, aws_elasticache_user_group",Provide an ElastiCache user group resource.,"package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_elasticache_user_group""
+}",2,"resource ""aws_elasticache_user"" ""test"" {
+  user_id       = ""testUserId""
+  user_name     = ""default""
+  access_string = ""on ~app::* -@all +@read +@hash +@bitmap +@geo -setbit -bitfield -hset -hsetnx -hmset -hincrby -hincrbyfloat -hdel -bitop -geoadd -georadius -georadiusbymember""
+  engine        = ""REDIS""
+  passwords     = [""password123456789""]
+}
+
+resource ""aws_elasticache_user_group"" ""test"" {
+  engine        = ""REDIS""
+  user_group_id = ""userGroupId""
+  user_ids      = [aws_elasticache_user.test.user_id]
+}","creates elasticache user resources(requires access string, engine = REDIS, user id and user name) and sets engine , creates group resource using the user ids"
+aws_redshift_cluster,Create a RedShift cluster resource with a single node,"package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_redshift_cluster""
+}",1,"resource ""aws_redshift_cluster"" ""example"" {
+  cluster_identifier = ""tf-redshift-cluster""
+  database_name      = ""mydb""
+  master_username    = ""exampleuser""
+  master_password    = ""Mustbe8characters""
+  node_type          = ""dc2.large""
+  cluster_type       = ""single-node""
+}","Has an aws_redshift_cluster resource and check cluster_type is ""single_node"" or number of nodes is 1"
+"aws_redshift_cluster, aws_redshift_usage_limit",Create a 2 node RedShift cluster and limit the concurrency scaling to 60 minutes,"package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_redshift_cluster""
+}",2,"resource ""aws_redshift_cluster"" ""example"" {
+  cluster_identifier = ""redshift-cluster-1""
+  node_type          = ""dc2.large""
+  number_of_nodes    = 2
+
+  database_name = ""mydb""
+  master_username = ""foo""
+  master_password = ""Mustbe8characters""
+
+  skip_final_snapshot = true
+}
+
+resource ""aws_redshift_usage_limit"" ""example"" {
+  cluster_identifier = aws_redshift_cluster.example.id
+  feature_type       = ""concurrency-scaling""
+  limit_type         = ""time""
+  amount             = 60
+}","Has an aws_redshift_cluster resource and check cluster_type is ""single_node"" or number of nodes is 2, check there is a aws_redshift_usage_limit resouce where the feature type is concurrency_scaling, limit_type is ""time"", and amount is 60"
+"aws_redshift_cluster, aws_redshift_endpoint_authorization",Create a 2 node RedShift cluster and create a new Amazon Redshift endpoint authorization for an account with AWS id 012345678910,"package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_redshift_cluster""
+}",2,"resource ""aws_redshift_cluster"" ""example"" {
+  cluster_identifier = ""redshift-cluster-1""
+  node_type          = ""dc2.large""
+  number_of_nodes    = 2
+
+  database_name = ""mydb""
+  master_username = ""foo""
+  master_password = ""Mustbe8characters""
+
+  skip_final_snapshot = true
+}
+
+resource ""aws_redshift_endpoint_authorization"" ""example"" {
+  account            = ""012345678910""
+  cluster_identifier = aws_redshift_cluster.example.cluster_identifier
+}",Has an aws_redshift_resouce with 2 nodes and creates a aws_redshift_endpoint_authorization resource with account =012345678910
+"aws_redshift_cluster, aws_redshift_snapshot_schedule, aws_redshift_snapshot_schedule_association",Create a 1 node RedShift cluster and automatically create a snapshot every 12 hours,"package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_redshift_cluster""
+}",2,"resource ""aws_redshift_cluster"" ""example"" {
+  cluster_identifier = ""redshift-cluster-1""
+  node_type          = ""dc2.large""
+  number_of_nodes    = 1
+
+  database_name = ""mydb""
+  master_username = ""foo""
+  master_password = ""Mustbe8characters""
+
+  skip_final_snapshot = true
+}
+
+resource ""aws_redshift_snapshot_schedule"" ""default"" {
+  identifier = ""tf-redshift-snapshot-schedule""
+  definitions = [
+    ""rate(12 hours)"",
+  ]
+}
+
+resource ""aws_redshift_snapshot_schedule_association"" ""default"" {
+  cluster_identifier  = aws_redshift_cluster.example.id
+  schedule_identifier = aws_redshift_snapshot_schedule.default.id
+}",Has an aws_redshift resouce with 1 node and aws_redshift_snapshot_schedule resource with rate set to 12 hours. Then have a aws_redshift_snapshot_schedle_association to conect the 2
+aws_redshift_cluster,Setup a 2 node RedShift cluster in us-east-1 and replicate it to us-east-2.,"package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_redshift_cluster""
+}",2,"provider ""aws"" {
+  region = ""us-east-1""
+  alias  = ""useast1""
+}
+
+# Redshift Cluster in us-east-1
+resource ""aws_redshift_cluster"" ""primary_cluster"" {
+  provider = aws.useast1
+
+  cluster_identifier  = ""primary-cluster""
+  database_name       = ""mydatabase""
+  master_username     = ""myusername""
+  master_password     = ""Mypassword1""
+  node_type           = ""dc2.large""
+  cluster_type        = ""multi-node""
+  number_of_nodes     = 2
+  skip_final_snapshot = true
+
+  snapshot_copy {
+    destination_region = ""us-east-2""
+  }
+
+}
+",Creates a redshift_clluster in us-east-1 and a snapshot_copy in us-east-2
+aws_lambda_layer_version,"Create a Lambda Layer Version resource from ""lambda_layer_payload.zip""","package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_lambda_layer_version""
+}",1,"resource ""aws_lambda_layer_version"" ""lambda_layer"" {
+  filename   = ""lambda_layer_payload.zip""
+  layer_name = ""lambda_layer_name""
+
+  compatible_runtimes = [""nodejs16.x""]
+}","Create a aws_lambda_layer_version by using file_name = ""lambda_layer_payload.zip"". Layer name can be any."
+"aws_cloudwatch_composite_alarm, aws_cloudwatch_metric_alarm",Create a CloudWatch Composite Alarm resource.,"package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_cloudwatch_composite_alarm""
+}",2,"resource ""aws_cloudwatch_composite_alarm"" ""example"" {
+  alarm_name        = ""example-composite-alarm""
+
+  alarm_rule = <<EOF
+ALARM(${aws_cloudwatch_metric_alarm.foobar.alarm_name})
+EOF
+
+}
+
+resource ""aws_cloudwatch_metric_alarm"" ""foobar"" {
+  alarm_name                = ""terraform-test-foobar5""
+  comparison_operator       = ""GreaterThanOrEqualToThreshold""
+  evaluation_periods        = ""2""
+  metric_name               = ""CPUUtilization""
+  namespace                 = ""AWS/EC2""
+  period                    = ""120""
+  statistic                 = ""Average""
+  threshold                 = ""80""
+  alarm_description         = ""This metric monitors ec2 cpu utilization""
+  insufficient_data_actions = []
+}",Creates an aws_cloudwatch_composite_alarm which requires at least one other aws_cloudwatch_metric_alarm
+aws_cloudwatch_metric_alarm,Create a CloudWatch Metric Alarm resource.,"package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_cloudwatch_metric_alarm""
+}",2,"resource ""aws_cloudwatch_metric_alarm"" ""foobar"" {
+  alarm_name                = ""terraform-test-foobar5""
+  comparison_operator       = ""GreaterThanOrEqualToThreshold""
+  evaluation_periods        = 2
+  metric_name               = ""CPUUtilization""
+  namespace                 = ""AWS/EC2""
+  period                    = 120
+  statistic                 = ""Average""
+  threshold                 = 80
+  alarm_description         = ""This metric monitors ec2 cpu utilization""
+  insufficient_data_actions = []
+}",Createsr a aws_cloudwatch_metric_alarm
+aws_cloudwatch_metric_alarm,Generate a Terraform HCL code snippet to define an AWS CloudWatch metric alarm named 'foobar' that monitors the 'CPUUtilization' metric of AWS EC2 instances. The alarm should trigger when the average CPU utilization is greater than or equal to 80% for two consecutive 2-minute periods. Ensure that no actions are taken when there's insufficient data.,"package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_cloudwatch_metric_alarm""
+}",2,"resource ""aws_cloudwatch_metric_alarm"" ""foobar"" {
+  alarm_name                = ""terraform-test-foobar5""
+  comparison_operator       = ""GreaterThanOrEqualToThreshold""
+  evaluation_periods        = 2
+  metric_name               = ""CPUUtilization""
+  namespace                 = ""AWS/EC2""
+  period                    = 120
+  statistic                 = ""Average""
+  threshold                 = 80
+  alarm_description         = ""This metric monitors ec2 cpu utilization""
+  insufficient_data_actions = []
+}",
+aws_dynamodb_contributor_insights,Create a DynamoDB Contributor Insights resource for a specific table with custom settings,"package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_dynamodb_contributor_insights""
+}",1,"resource ""aws_dynamodb_contributor_insights"" ""test"" {
+  table_name = ""ExampleTableName""
+}",Create a DynamoDB table and enable contributor insights
+"aws_dynamodb_kinesis_streaming_destination, aws_dynamodb_table, aws_kinesis_stream",Create a Kinesis Streaming Destination for a specific DynamoDB table.,"package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_dynamodb_kinesis_streaming_destination""
+}",2,"resource ""aws_dynamodb_table"" ""example"" {
+  name     = ""orders""
+  hash_key = ""id""
+
+  attribute {
+    name = ""id""
+    type = ""S""
+  }
+}
+
+resource ""aws_kinesis_stream"" ""example"" {
+  name        = ""order_item_changes""
+  shard_count = 1
+}
+
+resource ""aws_dynamodb_kinesis_streaming_destination"" ""example"" {
+  stream_arn = aws_kinesis_stream.example.arn
+  table_name = aws_dynamodb_table.example.name
+}","create a stream_arn (name), dynamodb table(hash_key, name, attribute (name, type)), create the kineses streaming"
+aws_dax_parameter_group,Create a custom DAX parameter group,"package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_dax_parameter_group""
+}",2,"resource ""aws_dax_parameter_group"" ""example"" {
+  name = ""example""
+
+  parameters {
+    name  = ""query-ttl-millis""
+    value = ""100000""
+  }
+
+  parameters {
+    name  = ""record-ttl-millis""
+    value = ""100000""
+  }
+}","require name of the group, list of parameters (key, value) pairs"
+aws_dynamodb_table,Configure on-demand capacity mode for a DynamoDB table.,"package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_dynamodb_table""
+}",1,"resource ""aws_dynamodb_table"" ""basic-dynamodb-table"" {
+  name           = ""example""
+  billing_mode   = ""PAY_PER_REQUEST""
+  hash_key       = ""UserId""
+
+  attribute {
+    name = ""UserId""
+    type = ""S""
+  }
+}","dynamodb table -> hash_key, name, attribute (name, type), billing mode pay per read"
+aws_sagemaker_code_repository,"Create a sagemaker_code_repository to aws_sagemaker_code_repository to ""https://github.com/hashicorp/terraform-provider-aws.git""","package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_sagemaker_code_repository""
+}",1,"resource ""aws_sagemaker_code_repository"" ""example"" {
+  code_repository_name = ""example""
+
+  git_config {
+    repository_url = ""https://github.com/hashicorp/terraform-provider-aws.git""
+  }
+}",
+"aws_iam_role, aws_sagemaker_image, aws_iam_policy_document",Create a aws_sagemaker_image,"package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_iam_role""
+}",2,"resource ""aws_iam_role"" ""example"" {
+  name               = ""example""
+  path               = ""/""
+  assume_role_policy = data.aws_iam_policy_document.example.json
+}
+
+data ""aws_iam_policy_document"" ""example"" {
+  statement {
+    actions = [""sts:AssumeRole""]
+
+    principals {
+      type        = ""Service""
+      identifiers = [""sagemaker.amazonaws.com""]
+    }
+  }
+}
+
+resource ""aws_sagemaker_image"" ""example"" {
+  image_name = ""example""
+  role_arn   = aws_iam_role.example.arn
+}",
+aws_sagemaker_human_task_ui,"Create a SageMaker Human Task UI resource from sagemaker-human-task-ui-template.html containing ""<h1>
+    TEST
+</h1>""","package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_sagemaker_human_task_ui""
+}",1,"resource ""aws_sagemaker_human_task_ui"" ""example"" {
+  human_task_ui_name = ""example""
+
+  ui_template {
+    content = file(""sagemaker-human-task-ui-template.html"")
+  }
+}",
+aws_ami,Create the latest Amazon Linux 2 AMI,"package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_ami""
+}",1,"data ""aws_ami"" ""latest_amazon_linux_2"" {
+  most_recent = true
+  owners      = [""amazon""]
+
+  filter {
+    name   = ""name""
+    values = [""amzn2-ami-hvm-*-x86_64-gp2""]
+  }
+}",create aws_ami resource with name = any
+aws_elasticache_cluster,Provide a resource to reduce the number of database calls.,"package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_elasticache_cluster""
+}",1,"resource ""aws_elasticache_cluster"" ""example"" {
+  cluster_id           = ""cluster-example""
+  engine               = ""memcached""
+  node_type            = ""cache.m4.large""
+  num_cache_nodes      = 2
+  parameter_group_name = ""default.memcached1.4""
+  port                 = 11211
+}","requires cluster id, engine=memcached, node_type, num_cache_nodes, parameter_group_name"
+aws_elasticache_user,authenticate a elasticache user with redis,"package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_elasticache_user""
+}",1,"resource ""aws_elasticache_user"" ""test"" {
+  user_id       = ""testUserId""
+  user_name     = ""testUserName""
+  access_string = ""on ~app::* -@all +@read +@hash +@bitmap +@geo -setbit -bitfield -hset -hsetnx -hmset -hincrby -hincrbyfloat -hdel -bitop -geoadd -georadius -georadiusbymember""
+  engine        = ""REDIS""
+  passwords     = [""password123456789""]
+}","requires access string, engine = REDIS, user id and user name"
+aws_elasticache_user,authenticate a elasticache user with iam,"package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_elasticache_user""
+}",1,"resource ""aws_elasticache_user"" ""test"" {
+  user_id       = ""testUserId""
+  user_name     = ""testUserName""
+  access_string = ""on ~* +@all""
+  engine        = ""REDIS""
+
+  authentication_mode {
+    type = ""iam""
+  }
+}","requires access string, engine = REDIS, user id and user name, authentication_mode {type = ""iam""}"
+aws_elasticache_user,authenticate a elasticache user with passwords,"package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_elasticache_user""
+}",2,"resource ""aws_elasticache_user"" ""test"" {
+  user_id       = ""testUserId""
+  user_name     = ""testUserName""
+  access_string = ""on ~* +@all""
+  engine        = ""REDIS""
+
+  authentication_mode {
+    type      = ""password""
+    passwords = [""password1"", ""password2""]
+  }
+}","requires access string, engine = REDIS, user id and user name, authentication_mode {type= ""password"", passwords = [""password1"", ""password2""]}"
+"aws_elasticache_user, aws_elasticache_user_group",Provides an ElastiCache user group resource with 3 users,"package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_elasticache_user_group""
+}",2,"resource ""aws_elasticache_user"" ""test"" {
+  user_id       = ""testUserId""
+  user_name     = ""default""
+  access_string = ""on ~app::* -@all +@read +@hash +@bitmap +@geo -setbit -bitfield -hset -hsetnx -hmset -hincrby -hincrbyfloat -hdel -bitop -geoadd -georadius -georadiusbymember""
+  engine        = ""REDIS""
+  passwords     = [""password123456789""]
+}
+
+resource ""aws_elasticache_user_group"" ""test"" {
+  engine        = ""REDIS""
+  user_group_id = ""userGroupId""
+  user_ids      = [aws_elasticache_user.test.user_id]
+}",
+aws_dynamodb_contributor_insights,"Enable contributor insights on a table named ""ExampleTableName""","package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_dynamodb_contributor_insights""
+}",1,"resource ""aws_dynamodb_contributor_insights"" ""test"" {
+  table_name = ""ExampleTableName""
+}",Create a DynamoDB table and enable contributor insights
+aws_dax_parameter_group,Create a DAX parameter group.,"package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_dax_parameter_group""
+}",2,"terraform {
+required_providers {
+aws = {
+source = ""hashicorp/aws""
+version = ""~> 5.0""
+}
+}
+}
+
+resource ""aws_dax_parameter_group"" ""example"" {
+name = ""example""
+
+parameters {
+name = ""query-ttl-millis""
+value = ""100000""
+}
+
+parameters {
+name = ""record-ttl-millis""
+value = ""100000""
+}
+}","Has one ""aws_dax_parameter_group"""
+aws_dynamodb_table,Enable point-in-time recovery for the DynamoDB table.,"package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_dynamodb_table""
+}",2,"provider ""aws"" {
+region = ""us-east-1"" # Change to your desired AWS region
+}
+
+resource ""aws_dynamodb_table"" ""example"" {
+name = ""your-dynamodb-table-name""
+billing_mode = ""PAY_PER_REQUEST"" # Or ""PROVISIONED"" if you prefer provisioned capacity
+hash_key = ""id""
+attribute {
+name = ""id""
+type = ""S""
+}
+
+point_in_time_recovery {
+enabled = true # Set to true to enable point-in-time recovery
+}
+
+# Define other table settings as needed
+}","Has one ""aws_dynamodb_table"" resource
+with one ""point_in_time_recovery"" with ""enabled"" = true"
+aws_dynamodb_table,Configure a custom Time to Live (TTL) attribute for data expiration.,"package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_dynamodb_table""
+}",2,"provider ""aws"" {
+region = ""us-east-1"" # Change to your desired AWS region
+}
+
+resource ""aws_dynamodb_table"" ""example"" {
+name = ""your-dynamodb-table-name""
+billing_mode = ""PAY_PER_REQUEST"" # Or ""PROVISIONED"" if you prefer provisioned capacity
+hash_key = ""id""
+attribute {
+name = ""id""
+type = ""S""
+}
+
+# Define other table settings as needed
+
+ttl {
+attribute_name = ""custom_ttl_attribute"" # Replace with your custom TTL attribute name
+enabled = true # Set to true to enable TTL on the table
+}
+}","Has one ""aws_dynamodb_table"" resource
+with one ""ttl""
+with one ""attribute_name"" = ""custom_ttl_attribute""
+with one ""enabled"" = true"
+aws_dynamodb_table,Configure a DynamoDB table with server-side encryption enabled.,"package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_dynamodb_table""
+}",2,"resource ""aws_dynamodb_table"" ""example"" {
+name = ""your-dynamodb-table-name""
+billing_mode = ""PAY_PER_REQUEST"" # Or ""PROVISIONED"" if you prefer provisioned capacity
+hash_key = ""id""
+attribute {
+name = ""id""
+type = ""S""
+}
+
+# Define other table settings as needed
+
+server_side_encryption {
+enabled = true
+}
+}","Has one ""aws_dynamodb_table"" resource
+with one ""server_side_encryption""
+with one ""enabled"" = true"
+aws_dynamodb_table,Create a DynamoDB table with data encryption at rest enabled for the table.,"package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_dynamodb_table""
+}",2,"provider ""aws"" {
+region = ""us-east-1"" # Change this to your desired AWS region
+}
+
+resource ""aws_dynamodb_table"" ""example"" {
+name = ""your-dynamodb-table-name""
+billing_mode = ""PAY_PER_REQUEST"" # Or ""PROVISIONED"" if you prefer provisioned capacity
+hash_key = ""id""
+attribute {
+name = ""id""
+type = ""S""
+}
+
+# Define other table settings as needed
+
+stream_enabled = true # Enable streams
+stream_view_type = ""NEW_AND_OLD_IMAGES"" # Choose the appropriate stream view type
+}","Has one ""aws_dynamodb_table"" resource
+with one ""stream_enabled"" = true
+with one ""stream_view_type"" = ""NEW_AND_OLD_IMAGES"""
+aws_vpc,Create an AWS VPC resource with an example CIDR block and IPv6 enabled,"package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_vpc""
+}",1,"resource ""aws_vpc"" ""main"" {
+  cidr_block = ""10.0.0.0/16""
+  assign_generated_ipv6_cidr_block = true
+}
+","Has one resource ""aws_vpc""        
+with one ""cidr_block"" with any valid IPv4 address
+with one ""assign_generated_ipv6_cidr_block"" with value ""true"""
+"aws_internet_gateway, aws_vpc",Create an AWS VPC resource with an Internet Gateway attached to it,"package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_internet_gateway""
+}",2,"resource ""aws_vpc"" ""main"" {
+  cidr_block = ""10.0.0.0/16""
+}
+
+resource ""aws_internet_gateway"" ""example_igw"" {
+  vpc_id = aws_vpc.main.id
+}","Has one resource ""aws_vpc""
+
+Has one resource ""aws_internet_gateway""
+with one ""vpc_id"" with value ""aws_vpc.{VPC NAME}.id"""
+"aws_egress_only_internet_gateway, aws_vpc",Create an AWS VPC with an Egress-Only Internet Gateway attached to it,"package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_egress_only_internet_gateway""
+}",2,"resource ""aws_vpc"" ""main"" {
+  cidr_block                       = ""10.0.0.0/16""
+}
+
+resource ""aws_egress_only_internet_gateway"" ""example_egress_igw"" {
+  vpc_id = aws_vpc.main.id
+}","Has one resource ""aws_vpc""
+
+Has one resource ""aws_egress_only_internet_gateway""
+with one ""vpc_id"" with value ""aws_vpc.{VPC NAME}.id"""
+"aws_subnet, aws_subnet, aws_vpc",Create an AWS VPC resource with one public subnet and one private subnet,"package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_vpc""
+}",2,"resource ""aws_vpc"" ""main"" {
+  cidr_block = ""10.0.0.0/16""
+}
+
+resource ""aws_subnet"" ""my_public_subnet"" {
+  vpc_id     = aws_vpc.main.id
+  cidr_block = ""10.0.1.0/24""
+
+  tags = {
+    Name = ""my_public_subnet""
+  }
+}
+
+resource ""aws_subnet"" ""my_private_subnet"" {
+  vpc_id     = aws_vpc.main.id
+  cidr_block = ""10.0.2.0/24""
+
+  tags = {
+    Name = ""my_private_subnet""
+  }
+}","Has one resource ""aws_vpc""
+
+Has one resource ""aws_subnet""
+with one ""vpc_id"" with value ""aws_vpc.{VPC NAME}.id""
+
+Has another resource ""aws_subnet""
+with one ""vpc_id"" with value ""aws_vpc.{VPC NAME}.id"""
+"aws_vpc, aws_vpc, aws_vpc_peering_connection",Create two AWS VPCs and establish a peering connection between them,"package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_vpc""
+}",2,"resource ""aws_vpc"" ""example_vpc1"" {
+  cidr_block = ""10.0.0.0/16""
+}
+
+resource ""aws_vpc"" ""example_vpc2"" {
+  cidr_block = ""10.1.0.0/16""
+}
+
+resource ""aws_vpc_peering_connection"" ""example_peer"" {
+  vpc_id        = aws_vpc.example_vpc1.id
+  peer_vpc_id   = aws_vpc.example_vpc2.id
+  auto_accept   = true
+}","Has two resources ""aws_vpc""
+
+Has one resource ""aws_vpc_peering_connection""
+with one ""vpc_id"" with value of one aws_vpc
+with one ""peer_vpc_id"" with value of the other aws_vpc"
+"aws_internet_gateway, aws_route_table, aws_vpc",Create an AWS VPC resource with an Internet Gateway attached and a route to a custom route table directing traffic for a specific CIDR block through the Internet Gateway,"package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_route_table""
+}",2,"resource ""aws_vpc"" ""main"" {
+  cidr_block = ""10.0.0.0/16""
+}
+
+resource ""aws_internet_gateway"" ""example_igw"" {
+  vpc_id = aws_vpc.main.id
+}
+
+resource ""aws_route_table"" ""example_public_rt"" {
+  vpc_id = aws_vpc.main.id
+
+  route {
+    cidr_block = ""10.0.1.0/24""
+    gateway_id = aws_internet_gateway.example_igw.id
+  }
+}","Has one resource ""aws_vpc""
+
+Has one resource ""aws_internet_gateway""
+with one ""vpc_id"" with value ""aws_vpc.{VPC NAME}.id""
+
+Has one resource ""aws_route_table""
+with one ""vpc_id"" with value ""aws_vpc.{VPC NAME}.id""
+with one route"
+"aws_neptune_cluster, aws_neptune_cluster_parameter_group",Set up a basic AWS Neptune cluster with a custom parameter group,"package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_neptune_cluster""
+}",2,"resource ""aws_neptune_cluster_parameter_group"" ""example"" {
+  family      = ""neptune1.2""
+  name        = ""example""
+  description = ""neptune cluster parameter group""
+
+  parameter {
+    name  = ""neptune_enable_audit_log""
+    value = 1
+  }
+}
+
+resource ""aws_neptune_cluster"" ""default"" {
+  cluster_identifier                  = ""neptune-cluster-demo""
+  engine                              = ""neptune""
+  backup_retention_period             = 5
+  preferred_backup_window             = ""07:00-09:00""
+  skip_final_snapshot                 = true
+  iam_database_authentication_enabled = true
+  apply_immediately                   = true
+  neptune_cluster_parameter_group_name = aws_neptune_cluster_parameter_group.example.id
+}","Has ""aws_neptune_cluster""
+with ""neptune_cluster_parameter_group_name""
+
+Has ""aws_neptune_cluster_parameter_group""
+with family = ""neptune1.2"""
+"aws_chime_voice_connector, aws_chime_voice_connector_logging",Create an AWS Chime Voice Connector. Then create an AWS Chime Voice Connector Logging resource with enable_sip_logs disabled and enable_media_metric_logs enabled,"package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_chime_voice_connector""
+}",2,"resource ""aws_chime_voice_connector"" ""default"" {
+  name               = ""vc-name-test""
+  require_encryption = true
+}
+
+resource ""aws_chime_voice_connector_logging"" ""default"" {
+  enable_sip_logs          = false
+  enable_media_metric_logs = true
+  voice_connector_id       = aws_chime_voice_connector.default.id
+}","Has one resource ""aws_chime_voice_connector""
+
+Has one resource ""aws_chime_voice_connector_logging""
+with voice_connector_id equal to the id of the voice connector
+with enable_sip_logs false
+with enable_media_metric_logs true"
+"aws_chime_voice_connector, aws_chime_voice_connector_logging",Create an AWS Chime Voice Connector. Then create an AWS Chime Voice Connector Logging resource with logging of ONLY media metrics,"package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_chime_voice_connector""
+}",2,"resource ""aws_chime_voice_connector"" ""default"" {
+  name               = ""vc-name-test""
+  require_encryption = true
+}
+
+resource ""aws_chime_voice_connector_logging"" ""default"" {
+  enable_sip_logs          = false
+  enable_media_metric_logs = true
+  voice_connector_id       = aws_chime_voice_connector.default.id
+}","Has one resource ""aws_chime_voice_connector""
+
+Has one resource ""aws_chime_voice_connector_logging""
+with voice_connector_id equal to the id of the voice connector
+with enable_sip_logs false
+with enable_media_metric_logs true"
+"aws_chime_voice_connector, aws_chime_voice_connector_logging",Create an AWS Chime Voice Connector with encryption and log media metrics.,"package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_chime_voice_connector""
+}",2,"resource ""aws_chime_voice_connector"" ""default"" {
+  name               = ""vc-name-test""
+  require_encryption = true
+}
+
+resource ""aws_chime_voice_connector_logging"" ""default"" {
+  enable_sip_logs          = false
+  enable_media_metric_logs = true
+  voice_connector_id       = aws_chime_voice_connector.default.id
+}","Has one resource ""aws_chime_voice_connector""
+with require_encryption=true
+
+Has one resource ""aws_chime_voice_connector_logging""
+with voice_connector_id equal to the id of the voice connector
+with enable_media_metric_logs true"
+"aws_chime_voice_connector, aws_chime_voice_connector_streaming","Create an AWS Chime Voice Connector with encryption. Then configure the streaming of the voice connector with retention period of 5 hours, notifications sent to SNS, and disable streaming to Amazon Kinesis.","package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_chime_voice_connector""
+}",2,"resource ""aws_chime_voice_connector"" ""default"" {
+  name               = ""vc-name-test""
+  require_encryption = true
+}
+
+resource ""aws_chime_voice_connector_streaming"" ""default"" {
+  disabled = false
+  voice_connector_id  = aws_chime_voice_connector.default.id
+  data_retention = 5
+  streaming_notification_targets = [""SNS""]
+}","Has one resource ""aws_chime_voice_connector""
+with require_encryption=true
+
+Has one resource ""aws_chime_voice_connector_streaming""
+with voice_connector_id equal to the id of the voice connector
+with streaming_enabled = false
+with data_retention = 5
+streaming_notification_targets = [""SNS""]"
+"aws_chime_voice_connector, aws_chime_voice_connector_streaming",Create an AWS Chime Voice Connector. Then set up a configuration to stream media to Amazon Kinesis.,"package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_chime_voice_connector""
+}",2,"resource ""aws_chime_voice_connector"" ""default"" {
+  name               = ""vc-name-test""
+  require_encryption = true
+}
+
+resource ""aws_chime_voice_connector_streaming"" ""default"" {
+  voice_connector_id  = aws_chime_voice_connector.default.id
+  data_retention = 5
+}","Has one resource ""aws_chime_voice_connector""
+
+Has one resource ""aws_chime_voice_connector_streaming""
+with voice_connector_id equal to the id of the voice connector
+with data_retention to some number"
+"aws_iam_user, aws_iam_user_ssh_key",Create a basic AWS IAM user with a basic SSH key attached.,"package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_iam_user_ssh_key""
+}",2,"resource ""aws_iam_user"" ""user"" {
+  name = ""test-user""
+  path = ""/""
+}
+
+resource ""aws_iam_user_ssh_key"" ""user"" {
+  username   = aws_iam_user.user.name
+  encoding   = ""SSH""
+  public_key = ""ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQD3F6tyPEFEzV0LX3X8BsXdMsQz1x2cEikKDEY0aIj41qgxMCP/iteneqXSIFZBp5vizPvaoIR3Um9xK7PGoW8giupGn+EPuxIA4cDM4vzOqOkiMPhz5XK0whEjkVzTo4+S0puvDZuwIsdiW9mxhJc7tgBNL0cYlWSYVkz4G/fslNfRPW5mYAM49f4fhtxPb5ok4Q2Lg9dPKVHO/Bgeu5woMc7RY0p1ej6D4CKFE6lymSDJpW0YHX/wqE9+cfEauh7xZcG0q9t2ta6F6fmX0agvpFyZo8aFbXeUBr7osSCJNgvavWbM/06niWrOvYX2xwWdhXmXSrbX8ZbabVohBK41 mytest@mydomain.com""
+}","Has one ""aws_iam_user"" resource
+with one ""name"" with any value
+
+Has one ""aws_iam_user_ssh_key"" resource
+with one ""username"" with value ""aws_iam_user.{USER NAME}.name""
+with one ""encoding"" with value ""SSH""
+with one ""public_key"" with any value"
+aws_iam_group,Create a basic AWS IAM group example,"package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_iam_group""
+}",1,"resource ""aws_iam_group"" ""group"" {
+  name = ""my-group""
+  path = ""/users/""
+}","Has one ""aws_iam_group"" resource
+with one ""name"" with any value"
+aws_iam_user,Create a basic AWS IAM user example,"package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_iam_user""
+}",1,"resource ""aws_iam_user"" ""lb"" {
+  name = ""loadbalancer""
+  path = ""/system/""
+
+  tags = {
+    tag-key = ""tag-value""
+  }
+}","Has one ""aws_iam_user"" resource
+with one ""name"" with any value"
+aws_iam_virtual_mfa_device,Create a basic AWS IAM Virtual MFA Device resource,"package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_iam_virtual_mfa_device""
+}",1,"resource ""aws_iam_virtual_mfa_device"" ""example"" {
+  virtual_mfa_device_name = ""example""
+}","Has one ""aws_iam_virtual_mfa_device"" resource
+with one ""virtual_mfa_device_name"" with any string"
+aws_s3_bucket,Create a S3 bucket with an example name,"package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_s3_bucket""
+}",1,"resource ""aws_s3_bucket"" ""example"" {
+  bucket = ""my-tf-test-bucket""
+}",Has an aws_s3_bucket resource
+aws_s3_bucket,Create an AWS resource to help me store images that I want to display on my website,"package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_s3_bucket""
+}",1,"resource ""aws_s3_bucket"" ""example-bucket"" {
+  bucket = ""test-bucket""
+}",Has an aws_s3_bucket resource
+"aws_s3_bucket, aws_s3_bucket_accelerate_configuration","Create S3 bucket with bucket name = ""mybucket"" and attach an acclerate configuration resource for the bucket with enabled status.","package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_s3_bucket""
+}",2,"resource ""aws_s3_bucket"" ""mybucket"" {
+  bucket = ""mybucket""
+}
+
+resource ""aws_s3_bucket_accelerate_configuration"" ""example"" {
+  bucket = aws_s3_bucket.mybucket.id
+  status = ""Enabled""
+}","Has an aws_s3_bucket resource
+
+Has an aws_bucket_accelerate_configuration resource
+with bucket = bucked id OR name
+with status = ""Enabled"" (case sensitive)"
+"aws_s3_bucket, aws_s3_bucket_acl, aws_s3_bucket_ownership_controls","Create S3 bucket with bucket name = ""mybucket"" and set the ownership control of the S3 bucket to be bucket owner preferred.
+Then create an ACL resource that depends on ownership control and makes bucket private. Use bucket references, NOT the name of the bucket.","package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_s3_bucket""
+}",2,"resource ""aws_s3_bucket"" ""example"" {
+  bucket = ""mybucket""
+}
+
+resource ""aws_s3_bucket_ownership_controls"" ""example"" {
+  bucket = aws_s3_bucket.example.id
+  rule {
+    object_ownership = ""BucketOwnerPreferred""
+  }
+}
+
+resource ""aws_s3_bucket_acl"" ""example"" {
+  depends_on = [aws_s3_bucket_ownership_controls.example]
+
+  bucket = aws_s3_bucket.example.id
+  acl    = ""private""
+}
+","Has an aws_s3_bucket resource
+
+Has an aws_s3_bucket_ownership_controls
+with bucket = bucket id
+and rule with object_ownership = ""BucketOwnerPreferred""
+
+Has an aws_s3_bucket_acl"
+"aws_s3_bucket, aws_s3_bucket, aws_s3_bucket_analytics_configuration","Create S3 bucket with bucket name = ""mybucket"". Add analytics configuration for entire S3 bucket and export results to a second S3 bucket. Use bucket references, NOT the names of the buckets.","package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_s3_bucket""
+}",2,"resource ""aws_s3_bucket_analytics_configuration"" ""example-entire-bucket"" {
+  bucket = aws_s3_bucket.example.id
+  name   = ""EntireBucket""
+
+  storage_class_analysis {
+    data_export {
+      destination {
+        s3_bucket_destination {
+          bucket_arn = aws_s3_bucket.analytics.arn
+        }
+      }
+    }
+  }
+}
+
+resource ""aws_s3_bucket"" ""example"" {
+  bucket = ""mybucket""
+}
+
+resource ""aws_s3_bucket"" ""analytics"" {
+  bucket = ""analytics destination""
+}","Has an aws_s3_bucket resource
+
+Has an aws_bucket_analytics_configuration resource
+with bucket = bucked id
+and storage_class_analysis with (refer to desired output)"
+"aws_s3_bucket, aws_s3_bucket_intelligent_tiering_configuration","Create S3 bucket with bucket name = ""mybucket"". Add intelligent tiering configuration resource for the bucket.","package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_s3_bucket""
+}",2,"resource ""aws_s3_bucket_intelligent_tiering_configuration"" ""example-entire-bucket"" {
+  bucket = aws_s3_bucket.example.id
+  name   = ""EntireBucket""
+
+  tiering {
+    access_tier = ""DEEP_ARCHIVE_ACCESS""
+    days        = 180
+  }
+  tiering {
+    access_tier = ""ARCHIVE_ACCESS""
+    days        = 125
+  }
+}
+
+resource ""aws_s3_bucket"" ""example"" {
+  bucket = ""mybucket""
+}","Has an aws_s3_bucket resource
+
+Has an aws_s3_bucket_intelligent_tiering
+with bucket = bucked id OR name
+and correct tiering attributes"
+"aws_s3_bucket, aws_s3_bucket_metric","Create a S3 bucket with bucket name = ""mybucket"" and a bucket metric resource that adds metrics configuration for the entire bucket.","package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_s3_bucket""
+}",2,"resource ""aws_s3_bucket"" ""example"" {
+  bucket = ""example""
+}
+
+resource ""aws_s3_bucket_metric"" ""example-entire-bucket"" {
+  bucket = aws_s3_bucket.example.id
+  name   = ""EntireBucket""
+}","Has an aws_s3_bucket resource
+
+Has an aws_s3_bucket_metric
+with bucket = bucked id OR name"
+"aws_s3_bucket, aws_s3_bucket_notification, aws_sns_topic",Create an AWS S3 bucket and send a SNS notification whenever a .log object is created in the bucket. Do not include policies required for this. ,"package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_s3_bucket""
+}",2,"resource ""aws_sns_topic"" ""topic"" {
+  name   = ""s3-event-notification-topic""
+}
+
+resource ""aws_s3_bucket"" ""bucket"" {
+  bucket = ""your-bucket-name""
+}
+
+resource ""aws_s3_bucket_notification"" ""bucket_notification"" {
+  bucket = aws_s3_bucket.bucket.id
+
+  topic {
+    topic_arn     = aws_sns_topic.topic.arn
+    events        = [""s3:ObjectCreated:*""]
+    filter_suffix = "".log""
+  }
+}","Has one resource ""aws_s3_bucket""
+
+Has one resource ""aws_sns_topic""
+
+Has one resource ""aws_s3_bucket_notification""
+with bucket = bucket id OR name
+with topic
+    with topic arn = sns topic arn 
+    and events = [""s3:ObjectCreated:*""]
+    and filter_suffix = "".log"""
+"aws_s3_bucket, aws_s3_bucket_object","Create S3 bucket with bucket name = ""mybucket"". Then create a bucket object resource for a file at source location ""path/to/file"" and upload the object to the bucket.","package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_s3_bucket""
+}",2,"resource ""aws_s3_bucket"" ""example"" {
+  bucket = ""mybucket""
+}
+resource ""aws_s3_bucket_object"" ""object"" {
+  bucket = ""your_bucket_name""
+  key    = ""new_object_key""
+  source = ""path/to/file""
+}","Has an aws_s3_bucket resource
+
+Has an aws_s3_object resource
+with bucket = bucket id OR name
+with source = ""path/to/file"""
+"aws_s3_bucket, aws_s3_object","I have a PDF with path ""assets/test.pdf"". Make an AWS resource to store this PDF and upload it.","package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_s3_bucket""
+}",2,"resource ""aws_s3_bucket"" ""example"" {
+  bucket = ""test-bucket""
+}
+
+resource ""aws_s3_object"" ""object"" {
+  bucket = ""my-bucket""
+  key    = ""new_object_key""
+  source = ""assets/test.pdf""
+}","Has an aws_s3_bucket resource
+
+Has an aws_s3_object resource
+with bucket = bucket id OR name
+with source = ""assets/test.pdf"""
+"aws_s3_bucket, aws_s3_bucket_object_lock_configuration","Create a S3 bucket with bucket name = ""mybucket"" and object lock enabled. Then, add an object lock configuration resource for the new bucket.","package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_s3_bucket""
+}",2,"resource ""aws_s3_bucket"" ""example"" {
+  bucket = ""mybucket""
+
+  object_lock_enabled = true
+}
+
+resource ""aws_s3_bucket_object_lock_configuration"" ""example"" {
+  bucket = aws_s3_bucket.example.id
+
+  rule {
+    default_retention {
+      mode = ""COMPLIANCE""
+      days = 5
+    }
+  }
+}","Has an aws_s3_bucket resource
+with object_lock_enabled = true
+
+Has an aws_s3_object_lock resource
+with bucket = bucket id OR name
+and a correct rule"
+"aws_s3_bucket, aws_s3_bucket_ownership_controls","Create a S3 bucket with bucket name = ""mybucket"". And create a bucket ownership controls resource to set object ownership to bucket owner preferred.","package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_s3_bucket""
+}",2,"resource ""aws_s3_bucket"" ""example"" {
+  bucket = ""example""
+}
+
+resource ""aws_s3_bucket_ownership_controls"" ""example"" {
+  bucket = aws_s3_bucket.example.id
+
+  rule {
+    object_ownership = ""BucketOwnerPreferred""
+  }
+}","Has an aws_s3_bucket resource
+
+Has an aws_s3_bucket_ownership_controls
+with bucket = bucket id OR name
+and rule with object_ownership = ""BucketOwnerPreferred"""
+"aws_kms_key, aws_s3_bucket, aws_s3_bucket_server_side_encryption_configuration",Create an AWS S3 bucket and apply KMS server side encryption that uses a defined KMS key resource.,"package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_s3_bucket""
+}",2,"resource ""aws_kms_key"" ""mykey"" {
+  description             = ""This key is used to encrypt bucket objects""
+  deletion_window_in_days = 10
+}
+
+resource ""aws_s3_bucket"" ""mybucket"" {
+  bucket = ""mybucket""
+}
+
+resource ""aws_s3_bucket_server_side_encryption_configuration"" ""example"" {
+  bucket = aws_s3_bucket.mybucket.id
+
+  rule {
+    apply_server_side_encryption_by_default {
+      kms_master_key_id = aws_kms_key.mykey.arn
+      sse_algorithm     = ""aws:kms""
+    }
+  }
+}","Has one resource ""aws_s3_bucket""
+
+Has one resource ""aws_kms_key""
+
+Has one resource ""aws_s3_bucket_server_side_encryption""
+with bucket = bucket id OR name
+with rule
+    with apply_server_side_encryption_by_default
+        with kms_master_key_id = kms key id
+        and sse_algorithm = ""aws:kms"""
+"aws_s3_bucket, aws_s3_bucket_cors_configuration",Create a S3 bucket and a bucket CORS configuration resource that attaches an example CORS rule to the bucket. Make sure the CORS rule has all of the required attributes.,"package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_s3_bucket""
+}",2,"resource ""aws_s3_bucket"" ""example"" {
+  bucket = ""mybucket""
+}
+
+resource ""aws_s3_bucket_cors_configuration"" ""example"" {
+  bucket = aws_s3_bucket.example.id
+
+  cors_rule {
+    allowed_headers = [""*""]
+    allowed_methods = [""PUT"", ""POST""]
+    allowed_origins = [""https://s3-website-test.hashicorp.com""]
+    expose_headers  = [""ETag""]
+    max_age_seconds = 3000
+  }
+
+  cors_rule {
+    allowed_methods = [""GET""]
+    allowed_origins = [""*""]
+  }
+}","Has an aws_s3_bucket
+
+Has an aws_s3_bucket_cors_configuration"
+"aws_s3_bucket, aws_s3_bucket_cors_configuration","Create a S3 bucket with a CORS configuration that allows POSTs and GETs from my website ""https://domain.com"".","package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_s3_bucket""
+}",2,"resource ""aws_s3_bucket"" ""example"" {
+  bucket = ""mybucket""
+}
+
+resource ""aws_s3_bucket_cors_configuration"" ""example"" {
+  bucket = aws_s3_bucket.example.id
+
+  cors_rule {
+    allowed_headers = [""*""]
+    allowed_methods = [""GET"", ""POST""]
+    allowed_origins = [""https://domain.com""]
+  }
+}","Has an aws_s3_bucket
+
+Has an aws_s3_bucket_cors_configuration
+with bucket = bucket id OR name
+with cors rule {
+    allowed_headers = [""*""]
+    allowed_methods = [""GET"", ""POST""]
+    allowed_origins = [""https://domain.com""]
+  }"
+"aws_s3_bucket, aws_s3_bucket_website_configuration",Create a S3 bucket and an example website configuration resource for the S3 bucket.,"package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_s3_bucket""
+}",2,"resource ""aws_s3_bucket"" ""example"" {
+  bucket = ""mybucket""
+}
+
+resource ""aws_s3_bucket_website_configuration"" ""example"" {
+  bucket = aws_s3_bucket.example.id
+}","Has an aws_s3_bucket
+
+Has an aws_s3_bucket_website_configuration
+with bucket = bucket id OR name"
+"aws_s3_bucket, aws_s3_bucket_website_configuration","Create a S3 bucket and host a static website. The website should use ""index.html"" in my bucket as the index page.","package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_s3_bucket""
+}",2,"resource ""aws_s3_bucket"" ""example"" {
+  bucket = ""mybucket""
+}
+
+resource ""aws_s3_bucket_website_configuration"" ""example"" {
+  bucket = aws_s3_bucket.example.id
+
+  index_document {
+    suffix = ""index.html""
+  }
+}","Has an aws_s3_bucket
+
+Has an aws_s3_bucket_website_configuration
+with bucket = bucket id OR name
+with index_document = { suffix = ""index.html"" }"
+"aws_s3_bucket, aws_s3_bucket_public_access_block",Create a S3 bucket and an example public access block resource for the S3 bucket.,"package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_s3_bucket""
+}",2,"resource ""aws_s3_bucket"" ""example"" {
+  bucket = ""mybucket""
+}
+
+resource ""aws_s3_bucket_public_access_block"" ""example"" {
+  bucket = aws_s3_bucket.example.id
+
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}","Has an aws_s3_bucket
+
+Has an aws_s3_bucket_public_access
+with bucket = bucket id OR name"
+"aws_s3_bucket, aws_s3_bucket_request_payment_configuration",Create a S3 bucket and an example payment configuration resource for the S3 bucket.,"package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_s3_bucket""
+}",2,"resource ""aws_s3_bucket"" ""example"" {
+  bucket = ""mybucket""
+}
+
+resource ""aws_s3_bucket_request_payment_configuration"" ""example"" {
+  bucket = aws_s3_bucket.example.id
+  payer  = ""Requester""
+}","Has an aws_s3_bucket
+
+Has an aws_s3_bucket_request_payment_configuration
+with bucket = bucket id OR name"
+"aws_s3_bucket, aws_s3_bucket_request_payment_configuration",Create a S3 bucket and an example payment configuration resource for the S3 bucket with the bucket owner paying for fees.,"package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_s3_bucket""
+}",2,"resource ""aws_s3_bucket"" ""example"" {
+  bucket = ""mybucket""
+}
+
+resource ""aws_s3_bucket_request_payment_configuration"" ""example"" {
+  bucket = aws_s3_bucket.example.id
+  payer  = ""BucketOwner""
+}","Has an aws_s3_bucket
+
+Has an aws_s3_bucket_request_payment_configuration
+with bucket = bucket id OR name
+with payer = ""BucketOwner"""
+"aws_s3_bucket, aws_s3_bucket_request_payment_configuration",Create a S3 bucket where the bucket owner pays for fees.,"package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_s3_bucket""
+}",2,"resource ""aws_s3_bucket"" ""example"" {
+  bucket = ""mybucket""
+}
+
+resource ""aws_s3_bucket_request_payment_configuration"" ""example"" {
+  bucket = aws_s3_bucket.example.id
+  payer  = ""BucketOwner""
+}","Has an aws_s3_bucket
+
+Has an aws_s3_bucket_request_payment_configuration
+with bucket = bucket id OR name
+with payer = ""BucketOwner"""
+"aws_s3_bucket, aws_s3_bucket_versioning",Create a S3 bucket and an example versioning resource for the S3 bucket.,"package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_s3_bucket""
+}",2,"resource ""aws_s3_bucket"" ""example"" {
+  bucket = ""example-bucket""
+}
+
+resource ""aws_s3_bucket_versioning"" ""versioning_example"" {
+  bucket = aws_s3_bucket.example.id
+  versioning_configuration {
+    status = ""Enabled""
+  }
+}","Has an aws_s3_bucket
+
+Has an aws_s3_bucket_versioning
+with bucket = bucket id OR name"
+"aws_s3_bucket, aws_s3_bucket_versioning",Create a S3 bucket with versioning disabled.,"package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_s3_bucket""
+}",2,"resource ""aws_s3_bucket"" ""example"" {
+  bucket = ""example-bucket""
+}
+
+resource ""aws_s3_bucket_versioning"" ""versioning_example"" {
+  bucket = aws_s3_bucket.example.id
+  versioning_configuration {
+    status = ""Disabled""
+  }
+}","Has an aws_s3_bucket
+
+Has an aws_s3_bucket_versioning
+with bucket = bucket id OR name
+with versioning_configuration = { status = ""Disabled"" } "
+"aws_s3_bucket, aws_s3_bucket, aws_s3_bucket_logging","Create a S3 bucket and a second S3 bucket. Then create an example logging resource for the first S3 bucket that stores logs in the second bucket. Make sure the log object keys have a prefix of ""log/"".","package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_s3_bucket""
+}",2,"resource ""aws_s3_bucket"" ""example"" {
+  bucket = ""mybucket""
+}
+
+resource ""aws_s3_bucket"" ""log_bucket"" {
+  bucket = ""mylogbucket""
+}
+
+resource ""aws_s3_bucket_logging"" ""example"" {
+  bucket = aws_s3_bucket.example.id
+
+  target_bucket = aws_s3_bucket.log_bucket.id
+  target_prefix = ""log/""
+}","Has two aws_s3_bucket
+
+Has an aws_s3_bucket_logging
+with bucket = bucket id OR name
+with target_bucket = second bucket id OR name
+with target_prefix = ""log/"""
+"aws_s3_bucket, aws_s3_bucket, aws_s3_bucket_logging",Create a S3 bucket and a configuration that stores server access logs into a second S3 bucket.,"package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_s3_bucket""
+}",2,"resource ""aws_s3_bucket"" ""example"" {
+  bucket = ""mybucket""
+}
+
+resource ""aws_s3_bucket"" ""log_bucket"" {
+  bucket = ""mylogbucket""
+}
+
+resource ""aws_s3_bucket_logging"" ""example"" {
+  bucket = aws_s3_bucket.example.id
+
+  target_bucket = aws_s3_bucket.log_bucket.id
+  target_prefix = ""log/""
+}","Has two aws_s3_bucket
+
+Has an aws_s3_bucket_logging
+with bucket = bucket id OR name
+with target_bucket = second bucket id OR name
+with target_prefix = ""log/"""
+aws_lightsail_instance,generate Basic Amazon Lightsail,"package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_lightsail_instance""
+}",1,"provider ""aws"" {
+  region     = ""us-east-1""
+}
+
+resource ""aws_lightsail_instance"" ""custom"" {
+  name              = ""custom""
+  availability_zone = ""us-east-1a""
+  blueprint_id      = ""amazon_linux_2""
+  bundle_id         = ""nano_2_0""
+}","have one ""aws_lightsail_instance"" resource
+    with ""name"" argument
+    with ""availability_zone"" argument
+    with ""blueprint_id"" argument
+    with ""bundle_id"" argument"
+aws_lightsail_instance,generate Basic Amazon Lightsail with user Data,"package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_lightsail_instance""
+}",2,"provider ""aws"" {
+  region     = ""us-east-1""
+}
+
+resource ""aws_lightsail_instance"" ""custom"" {
+  name              = ""custom""
+  availability_zone = ""us-east-1b""
+  blueprint_id      = ""amazon_linux_2""
+  bundle_id         = ""nano_1_0""
+  user_data         = ""sudo yum install -y httpd && sudo systemctl start httpd && sudo systemctl enable httpd && echo '<h1>Deployed via Terraform</h1>' | sudo tee /var/www/html/index.html""
+}","have one ""aws_lightsail_instance"" resource
+    with ""name"" argument
+    with ""availability_zone"" argument
+    with ""blueprint_id"" argument
+    with ""bundle_id"" argument
+    with ""user_data"" argument"
+aws_lightsail_instance,generate aws lightsail with auto snapshots enabled,"package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_lightsail_instance""
+}",2,"provider ""aws"" {
+  region     = ""us-east-1""
+}
+
+resource ""aws_lightsail_instance"" ""test"" {
+  name              = ""custom_instance""
+  availability_zone = ""us-east-1b""
+  blueprint_id      = ""amazon_linux_2""
+  bundle_id         = ""nano_2_0""
+  add_on {
+    type          = ""AutoSnapshot""
+    snapshot_time = ""06:00""
+    status        = ""Enabled""
+  }
+  tags = {
+    foo = ""bar""
+  }
+}","have one ""aws_lightsail_instance"" resource
+with ""name"" argument
+with ""availability_zone"" argument
+with ""blueprint_id"" argument
+with ""bundle_id"" argument
+with ""add_on"" argument
+    with type = ""AutoSnapshot""
+    with snapshot_time argument
+    with status = ""Enabled"""
+aws_lightsail_instance,create AWS Lightsail with default blueprint,"package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_lightsail_instance""
+}",1,"provider ""aws"" {
+  region     = ""us-east-1""
+}
+
+resource ""aws_lightsail_instance"" ""gitlab_test"" {
+  name              = ""custom_gitlab""
+  availability_zone = ""us-east-1b""
+  blueprint_id      = ""amazon_linux_2""
+  bundle_id         = ""nano_2_0""
+}","have one ""aws_lightsail_instance"" resource
+with ""name"" argument
+with ""availability_zone"" argument
+with ""blueprint_id"" argument
+with ""bundle_id"" argument"
+aws_lightsail_instance,create AWS Lightsail with WordPress blueprint,"package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_lightsail_instance""
+}",1,"provider ""aws"" {
+  region     = ""us-east-1""
+}
+
+resource ""aws_lightsail_instance"" ""custom"" {
+  name              = ""custom""
+  availability_zone = ""us-east-1b""
+  blueprint_id      = ""wordpress""
+  bundle_id         = ""nano_2_0""
+ }","have one ""aws_lightsail_instance"" resource
+with ""name"" argument
+with ""availability_zone"" argument
+with ""blueprint_id"" = wordpress
+with ""bundle_id"" argument"
+"aws_lightsail_instance, aws_lightsail_static_ip, aws_lightsail_static_ip_attachment",create Amazon Lightsail with static ipv4 IP,"package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_lightsail_instance""
+}",2,"provider ""aws"" {
+  region     = ""us-east-1""
+}
+
+resource ""aws_lightsail_static_ip_attachment"" ""test"" {
+  static_ip_name = aws_lightsail_static_ip.test.id
+  instance_name  = aws_lightsail_instance.test.id
+}
+
+resource ""aws_lightsail_static_ip"" ""test"" {
+  name = ""example""
+}
+
+resource ""aws_lightsail_instance"" ""test"" {
+  name              = ""custom_gitlab""
+  availability_zone = ""us-east-1b""
+  blueprint_id      = ""amazon_linux_2""
+  bundle_id         = ""nano_2_0""
+}","have one ""aws_lightsail_instance"" resource
+    with ""name"" argument
+    with ""availability_zone"" argument
+    with ""blueprint_id"" argument
+    with ""bundle_id"" argument
+
+has one ""aws_lightsail_static_ip"" resource
+    with ""name"" argument
+
+has one ""aws_lightsail_static_ip_attachment"" resource
+    with ""static_ip_name"" argument
+    with ""instance_name"" argument"
+aws_lightsail_instance,create Amazon Lightsail with dualstack IP,"package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_lightsail_instance""
+}",1,"resource ""aws_lightsail_instance"" ""custom"" {
+  name              = ""custom""
+  availability_zone = ""us-east-1b""
+  blueprint_id      = ""wordpress""
+  bundle_id         = ""nano_2_0""
+  ip_address_type = ""dualstack""
+ }","have one ""aws_lightsail_instance"" resource
+    with ""name"" argument
+    with ""availability_zone"" argument
+    with ""blueprint_id"" argument
+    with ""bundle_id"" argument
+    with ""ip_address_type"" = ""dualstack"""
+"aws_lightsail_instance, aws_lightsail_key_pair",create Amazon Lightsail with a separate SSH key,"package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_lightsail_instance""
+}",2,"resource ""aws_lightsail_key_pair"" ""lg_key_pair"" {
+  name       = ""importing""
+  public_key = file(""~/.ssh/id_rsa.pub"")
+}
+
+resource ""aws_lightsail_instance"" ""custom"" {
+  name              = ""custom""
+  availability_zone = ""us-east-1b""
+  blueprint_id      = ""wordpress""
+  bundle_id         = ""nano_2_0""
+  key_pair_name = aws_lightsail_key_pair.lg_key_pair.name
+ }","have one ""aws_lightsail_instance"" resource
+    with ""name"" argument
+    with ""availability_zone"" argument
+    with ""blueprint_id"" argument
+    with ""bundle_id"" argument
+    with key_pair_name argument
+
+have one ""aws_lightsail_key_pair"" resource
+    with ""name"" argument
+    with ""public_key""argument"
+aws_lightsail_database,create AWS Lightsail that creates a managed database,"package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_lightsail_database""
+}",1,"resource ""aws_lightsail_database"" ""test"" {
+  relational_database_name = ""test""
+  availability_zone        = ""us-east-1a""
+  master_database_name     = ""testdatabasename""
+  master_password          = ""testdatabasepassword""
+  master_username          = ""test""
+  blueprint_id             = ""mysql_8_0""
+  bundle_id                = ""micro_1_0""
+}","have one ""aws_lightsail_database"" resource
+    with relational_database_name argument
+    with master_database_name 
+    with master_password
+    with master_username
+    with blueprint_id
+    with bundle_id
+    "
+aws_lightsail_database,create an AWS Lightsail instance that creates a mysql database,"package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_lightsail_database""
+}",1,"resource ""aws_lightsail_database"" ""test"" {
+  relational_database_name = ""test""
+  availability_zone        = ""us-east-1a""
+  master_database_name     = ""testdatabasename""
+  master_password          = ""testdatabasepassword""
+  master_username          = ""test""
+  blueprint_id             = ""mysql_8_0""
+  bundle_id                = ""micro_1_0""
+}","have one ""aws_lightsail_database"" resource
+    with relational_database_name argument
+    with master_database_name 
+    with master_password
+    with master_username
+    with blueprint_id = mysql_8_0
+    with bundle_id
+    "
+aws_lightsail_database,"create AWS Lightsail that creates a mysql database. It should allow daily backups to take place between 16:00 and 16:30 each day and  requires any maintiance tasks (anything that would cause an outage, including changing some attributes) to take place on Tuesdays between 17:00 and 17:30","package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_lightsail_database""
+}",2,"resource ""aws_lightsail_database"" ""test"" {
+  relational_database_name     = ""test""
+  availability_zone            = ""us-east-1a""
+  master_database_name         = ""testdatabasename""
+  master_password              = ""testdatabasepassword""
+  master_username              = ""test""
+  blueprint_id                 = ""mysql_8_0""
+  bundle_id                    = ""micro_1_0""
+  preferred_backup_window      = ""16:00-16:30""
+  preferred_maintenance_window = ""Tue:17:00-Tue:17:30""
+}","have one ""aws_lightsail_database"" resource
+    with relational_database_name argument
+    with master_database_name 
+    with master_password
+    with master_username
+    with blueprint_id
+    with bundle_id
+    with  preferred_backup_window    = ""16:00-16:30""
+  preferred_maintenance_window = ""Tue:17:00-Tue:17:30""
+
+    "
+aws_lightsail_database,"AWS Lightsail that creates a postgres database, which enable creating a final snapshot of your database on deletion","package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_lightsail_database""
+}",2,"resource ""aws_lightsail_database"" ""test"" {
+  relational_database_name     = ""test""
+  availability_zone            = ""us-east-1a""
+  master_database_name         = ""testdatabasename""
+  master_password              = ""testdatabasepassword""
+  master_username              = ""test""
+  blueprint_id                 = ""postgres_12""
+  bundle_id                    = ""micro_1_0""
+  final_snapshot_name          = ""MyFinalSnapshot""
+}","""have one """"aws_lightsail_database"""" resource
+    with relational_database_name argument
+    with master_database_name 
+    with master_password
+    with master_username
+    with blueprint_id = postgres_12
+    with bundle_id
+    with final_snapshot_name"
+aws_lightsail_database,"AWS Lightsail that creates a postgres database, which enable applying changes immediately instead of waiting for a maintiance window","package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_lightsail_database""
+}",2,"resource ""aws_lightsail_database"" ""test"" {
+  relational_database_name = ""test""
+  availability_zone        = ""us-east-1a""
+  master_database_name     = ""testdatabasename""
+  master_password          = ""testdatabasepassword""
+  master_username          = ""test""
+  blueprint_id             = ""postgres_12""
+  bundle_id                = ""micro_1_0""
+  apply_immediately        = true
+}","""have one """"aws_lightsail_database"""" resource
+    with relational_database_name argument
+    with master_database_name 
+    with master_password
+    with master_username
+    with blueprint_id = postgres_12
+    with bundle_id
+    apply_immediately  = true"
+"aws_lightsail_disk, aws_availability_zones",create a Lightsail Disk resource,"package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_lightsail_disk""
+}",2,"provider ""aws"" {
+  region     = ""us-east-1""
+}
+
+data ""aws_availability_zones"" ""available"" {
+  state = ""available""
+
+  filter {
+    name   = ""opt-in-status""
+    values = [""opt-in-not-required""]
+  }
+}
+
+resource ""aws_lightsail_disk"" ""test"" {
+  name              = ""test""
+  size_in_gb        = 8
+  availability_zone = data.aws_availability_zones.available.names[0]
+}","have one aws_lightsail_disk resource
+    with name
+    with size_in_gb
+    with availability_zone"
+aws_lightsail_certificate,Provides a lightsail certificate.,"package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_lightsail_certificate""
+}",1,"resource ""aws_lightsail_certificate"" ""test"" {
+  name                      = ""test""
+  domain_name               = ""testdomain.com""
+  subject_alternative_names = [""www.testdomain.com""]
+}","have one aws_lightsail_certificate
+    with name
+    with domain_name"
+aws_glacier_vault,an S3 Glacier vault for long-term data archiving,"package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_glacier_vault""
+}",1,"provider ""aws"" {
+  region = ""us-east-1""  # Replace with your desired AWS region
+}
+
+resource ""aws_glacier_vault"" ""example"" {
+  name = ""my-glacier-vault""
+}","has one ""aws_glacier_vault"" resource
+     with ""name"" attribute"
+aws_glacier_vault,generate a aws storage for long term data and backup,"package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_glacier_vault""
+}",1,"provider ""aws"" {
+  region = ""us-east-1""  # Replace with your desired AWS region
+}
+
+resource ""aws_glacier_vault"" ""example"" {
+  name = ""my-glacier-vault""
+}","has one ""aws_glacier_vault"" resource
+     with ""name"" attribute"
+"aws_glacier_vault, aws_sns_topic",generage an S3 Glacier vault that pushes notification when archive retrieval completed,"package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_glacier_vault""
+}",2,"provider ""aws"" {
+  region     = ""us-east-1""
+}
+
+# Create an SNS topic for notifications
+resource ""aws_sns_topic"" ""glacier_notifications"" {
+  name = ""glacier-archive-retrieval-notifications""
+}
+
+# Create an S3 Glacier Vault
+resource ""aws_glacier_vault"" ""my_archive"" {
+  name = ""MyArchive""
+
+  notification {
+    sns_topic = aws_sns_topic.glacier_notifications.arn
+    events    = [""ArchiveRetrievalCompleted""]
+  }
+}","has one ""aws_glacier_vault"" resource
+     with ""name"" attribute
+     with notification attribute
+        with sns_topic attribute
+        with events attribute
+
+has one aws_sns_topic resources
+    with name attribute"
+aws_db_instance,create a basic AWS RDS instance,"package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_db_instance""
+}",2,"# Define the provider block for AWS
+provider ""aws"" {
+  region = ""us-east-2"" # Set your desired AWS region
+}
+
+resource ""aws_db_instance"" ""default"" {
+  allocated_storage    = 10
+  db_name              = ""mydb""
+  engine               = ""mysql""
+  engine_version       = ""5.7""
+  instance_class       = ""db.t3.micro""
+  username             = ""foo""
+  password             = ""foobarbaz""
+  parameter_group_name = ""default.mysql5.7""
+  skip_final_snapshot  = true
+}","Has one ""aws_db_instance"" resource
+    with one ""allocated_storage""
+    with one ""engine"" and a valid engine value
+    with one ""instance_class"" and a valid instance class type
+    with one ""password""
+    with one ""username"""
+aws_db_instance,create a basic AWS SQL database,"package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_db_instance""
+}",1,"resource ""aws_db_instance"" ""default"" {
+  allocated_storage    = 10
+  engine               = ""mysql""
+  instance_class       = ""db.t3.micro""
+  username             = ""foo""
+  password             = ""foobarbaz""
+}","Has one ""aws_db_instance"" resource
+    with one ""allocated_storage""
+    with one ""engine"" and a valid engine value
+    with one ""instance_class"" and a valid instance class type
+    with one ""password""
+    with one ""username"""
+aws_db_instance,Create a db.t4g.large AWS PostgresSQL,"package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_db_instance""
+}",1,"resource ""aws_db_instance"" ""default"" {
+  allocated_storage    = 20
+  engine               = ""postgres""
+  instance_class       = ""db.t4g.large""
+  username             = ""foo""
+  password             = ""foobarbaz""
+}","Has one ""aws_db_instance"" resource
+with one ""allocated_storage"" minimun value is 20
+with one ""engine"" with value ""postgres""
+with one ""instance_class"" with value ""db.t4g.large""
+with one ""password""
+with one ""username"""
+aws_db_instance,create a memory optimized PostgresSQL,"package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_db_instance""
+}",1,"resource ""aws_db_instance"" ""default"" {
+  allocated_storage    = 20
+  engine               = ""postgres""
+  instance_class       = ""db.z1d.micro""
+  username             = ""foo""
+  password             = ""foobarbaz""
+}","Has one ""aws_db_instance"" resource
+with one ""allocated_storage"" minimun value is 20
+with one ""engine"" with value ""postgres""
+with one ""instance_class"" with valid memory-optimized class
+with one ""password""
+with one ""username"""
+aws_db_instance,Create an AWS mySQL instance. Any changes on it will be applied immediately,"package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_db_instance""
+}",2,"# Define the provider block for AWS
+provider ""aws"" {
+  region = ""us-east-2"" # Set your desired AWS region
+}
+
+resource ""aws_db_instance"" ""default"" {
+  allocated_storage    = 20
+  engine               = ""mysql""
+  instance_class       = ""db.z1d.micro""
+  username             = ""foo""
+  password             = ""foobarbaz""
+  apply_immediately = true
+}","Has one ""aws_db_instance"" resource
+with one ""allocated_storage""
+with one ""engine"" with value ""mysql""
+with one ""instance_class"" 
+with one ""password""
+with one ""username""
+with one ""apply_immediately"" set to true"
+aws_db_instance,Create an AWS mySQL instance that skips the final snapshot,"package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_db_instance""
+}",1,"resource ""aws_db_instance"" ""default"" {
+  allocated_storage    = 20
+  engine               = ""mysql""
+  instance_class       = ""db.z1d.micro""
+  username             = ""foo""
+  password             = ""foobarbaz""
+  skip_final_snapshot = true
+}","Has one ""aws_db_instance"" resource
+with one ""allocated_storage""
+with one ""engine"" with value ""mysql""
+with one ""instance_class"" 
+with one ""password""
+with one ""username""
+with one ""skip_final_snapshot"" set to true"
+"aws_db_instance, aws_db_instance","create an aws sql, and make a replica of it","package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_db_instance""
+}",2,"resource ""aws_db_instance"" ""default"" {
+  allocated_storage    = 20
+  engine               = ""mysql""
+  instance_class       = ""db.z1d.micro""
+  username             = ""foo""
+  password             = ""foobarbaz""
+}
+
+resource ""aws_db_instance"" ""replica"" {
+  replicate_source_db = aws_db_instance.default.arn
+  instance_class       = ""db.z1d.micro""
+  password             = ""1234567""
+}","Has two ""aws_db_instance"" resources
+
+resource 1:
+with one ""allocated_storage""
+with one ""engine"" and a valid engine value
+with one ""instance_class"" and a valid instance class type
+with one ""password""
+with one ""username""
+
+resource 2:
+with one ""instance_class""
+with one ""replicate_source_db"" = ""aws_db_instance.resource1.identifier"""
+aws_db_instance,create a aws relational database from a snapshot,"package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_db_instance""
+}",1,"resource ""aws_db_instance"" ""replica"" {
+  snapshot_identifier = ""your identifier""
+  instance_class       = ""db.z1d.micro""
+}","Has one ""aws_db_instance"" resource
+    with one ""allocated_storage""
+    with one ""engine"" and a valid engine value
+    with one ""instance_class"" and a valid instance class type
+    with one ""password""
+    with one ""username"""
+aws_db_instance,"create a basic AWS RDS instance, with gp3 storage type","package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_db_instance""
+}",1,"resource ""aws_db_instance"" ""default"" {
+  allocated_storage    = 20
+  engine               = ""mysql""
+  instance_class       = ""db.t3.micro""
+  username             = ""foo""
+  password             = ""foobarbaz""
+  storage_type        = ""gp3""
+}","Has one ""aws_db_instance"" resource
+    with one ""allocated_storage""
+    with one ""engine"" and a valid engine value
+    with one ""instance_class"" and a valid instance class type
+    with one ""password""
+    with one ""username"""
+aws_db_instance,"create a basic AWS RDS instance, with io1 storage type","package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_db_instance""
+}",1,"resource ""aws_db_instance"" ""default"" {
+  allocated_storage    = 100
+  engine               = ""mysql""
+  instance_class       = ""db.t3.micro""
+  username             = ""foo""
+  password             = ""foobarbaz""
+  storage_type        = ""io1""
+}","Has one ""aws_db_instance"" resource
+    with one ""allocated_storage""
+    with one ""engine"" and a valid engine value
+    with one ""instance_class"" and a valid instance class type
+    with one ""password""
+    with one ""username"""
+aws_db_instance,create an aws database restored from s3,"package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_db_instance""
+}",2,"resource ""aws_db_instance"" ""default"" {
+  allocated_storage    = 20
+  engine               = ""mysql""
+  instance_class       = ""db.t3.micro""
+  username             = ""foo""
+  password             = ""foobarbaz""
+  s3_import {
+    bucket_name           = ""mybucket""
+    ingestion_role        = ""arn:aws:iam::1234567890:role/role-xtrabackup-rds-restore""
+    source_engine         = ""mysql""
+    source_engine_version = ""5.6""
+  }
+}","Has one ""aws_db_instance"" resource
+    with one ""allocated_storage""
+    with one ""engine"" and a valid engine value
+    with one ""instance_class"" and a valid instance class type
+    with one ""password""
+    with one ""username""
+    with one s3_import
+        with one bucket_name
+        with one ingestion_role
+        with one source_engine
+        with one source_engine_verison"
+aws_db_instance,create an AWS database that enables storage autoscaling,"package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_db_instance""
+}",1,"resource ""aws_db_instance"" ""default"" {
+  allocated_storage    = 20
+  engine               = ""mysql""
+  instance_class       = ""db.t3.micro""
+  username             = ""foo""
+  password             = ""foobarbaz""
+  max_allocated_storage = 100
+}","Has one ""aws_db_instance"" resource
+    with one ""allocated_storage""
+    with one ""engine"" and a valid engine value
+    with one ""instance_class"" and a valid instance class type
+    with one ""password""
+    with one ""username""
+    with one max_allocated_storage"
+aws_db_instance,"create an aws database that Managed Master Passwords via Secrets Manager, default KMS Key","package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_db_instance""
+}",1,"resource ""aws_db_instance"" ""default"" {
+  allocated_storage    = 20
+  engine               = ""mysql""
+  instance_class       = ""db.t3.micro""
+  username             = ""foo""
+  manage_master_user_password = true
+}","Has one ""aws_db_instance"" resource
+    with one ""allocated_storage""
+    with one ""engine"" and a valid engine value
+    with one ""instance_class"" and a valid instance class type
+    with one ""username""
+    with one manage_master_user_password"
+"aws_db_instance, aws_kms_key","create an aws database that Managed Master Passwords via Secrets Manager, with specific KMS Key","package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_db_instance""
+}",2,"resource ""aws_db_instance"" ""default"" {
+  allocated_storage    = 20
+  engine               = ""mysql""
+  instance_class       = ""db.t3.micro""
+  username             = ""foo""
+  manage_master_user_password = true
+  master_user_secret_kms_key_id = aws_kms_key.example.key_id
+}
+
+resource ""aws_kms_key"" ""example"" {
+  description = ""Example KMS Key""
+}","Has one ""aws_db_instance"" resource
+    with one ""allocated_storage""
+    with one ""engine"" and a valid engine value
+    with one ""instance_class"" and a valid instance class type
+    with one ""username""
+    with one manage_master_user_password
+    with one ""master_user_secret_kms_key_id""  
+ 
+has one ""aws_kms_key"""
+"aws_db_instance, aws_db_snapshot",Create an AWS mySQL instance and a snapshot of the instance,"package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_db_snapshot""
+}",2,"resource ""aws_db_instance"" ""default"" {
+  allocated_storage    = 20
+  engine               = ""mysql""
+  instance_class       = ""db.t3.micro""
+  username             = ""foo""
+  password             = ""foobarbaz""
+}
+
+resource ""aws_db_snapshot"" ""test"" {
+  db_instance_identifier = aws_db_instance.default.identifier
+  db_snapshot_identifier = ""testsnapshot1234""
+}","Has one ""aws_db_instance"" resource
+with one ""allocated_storage""
+with one ""engine"" and a valid engine value
+with one ""instance_class"" and a valid instance class type
+with one ""password""
+with one ""username""
+
+Has one ""aws_db_snapshot"" instance
+with one ""db_instance_identifier""
+with one ""db_snapshot_identifier"""
+aws_efs_file_system,create a AWS EFS File System with tags,"package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_efs_file_system""
+}",1,"resource ""aws_efs_file_system"" ""foo"" {
+  creation_token = ""my-product""
+
+  tags = {
+    Name = ""MyProduct""
+  }
+}","Have one ""aws_efs_file_system"" resource
+    with one tags"
+aws_efs_file_system,create a AWS EFS Using lifecycle policy,"package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_efs_file_system""
+}",1,"resource ""aws_efs_file_system"" ""foo_with_lifecyle_policy"" {
+  creation_token = ""my-product""
+
+  lifecycle_policy {
+    transition_to_ia = ""AFTER_30_DAYS""
+  }
+}","Have one ""aws_efs_file_system"" resource"
+"aws_efs_backup_policy, aws_efs_file_system",create a AWS EFS with automatic backups enabled,"package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_efs_file_system""
+}",2,"resource ""aws_efs_file_system"" ""fs"" {
+  creation_token = ""my-product""
+}
+
+resource ""aws_efs_backup_policy"" ""policy"" {
+  file_system_id = aws_efs_file_system.fs.id
+
+  backup_policy {
+    status = ""ENABLED""
+  }
+}","Have one ""aws_efs_file_system"" resource
+
+Have one ""aws_efs_backup_policy"" resource
+with one ""file_system_id""
+with one ""backup_policy"""
+aws_egress_only_internet_gateway,"creates an egress-only internet gateway named ""pike"" associated with a specified VPC, allowing IPv6-enabled instances to connect to the internet without allowing inbound internet traffic, and tags it with ""permissions"".","package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_egress_only_internet_gateway""
+}",2,"# Define the provider block for AWS
+provider ""aws"" {
+  region = ""us-east-2"" # Set your desired AWS region
+}
+
+resource ""aws_egress_only_internet_gateway"" ""pike"" {
+  vpc_id = ""vpc-0c33dc8cd64f408c4""
+  tags = {
+    pike = ""permissions""
+  }
+}","Has one ""aws_egress_only_internet_gateway"" resource:
+Associated with a specified ""aws_vpc"" resource
+Designed to allow IPv6-enabled instances within the VPC to connect to the internet while preventing inbound internet traffic
+Tagged with ""permissions"" to categorize or specify its role or access levels within the infrastructure"
+aws_egress_only_internet_gateway,"creates an egress-only internet gateway associated with a specified VPC, allowing IPv6-enabled instances to connect to the internet without allowing inbound internet traffic","package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_egress_only_internet_gateway""
+}",1,"resource ""aws_egress_only_internet_gateway"" ""pike"" {
+  vpc_id = ""vpc-0c33dc8cd64f408c4""
+  tags = {
+    pike = ""permissions""
+  }
+}","Has one ""aws_egress_only_internet_gateway"" resource:
+Associated with a specified ""aws_vpc"" resource
+Designed to allow IPv6-enabled instances within the VPC to connect to the internet while preventing inbound internet traffic
+"
+aws_nat_gateway,creates a NAT Gateway associated with a specified subnet and Elastic IP allocation ID. The NAT Gateway is configured for public connectivity.,"package terraform.validation
+
+default is_correct = false
+
+is_correct {
+    some r
+    r := input.resource_changes[_]
+    r.type == ""aws_nat_gateway""
+}",2,"terraform {
+  required_providers {
+    aws = {
+      source  = ""hashicorp/aws""
+      version = ""~> 4.16""
+    }
+  }
+
+  required_version = "">= 1.2.0""
+}
+# Define the provider block for AWS
+provider ""aws"" {
+  region = ""us-east-2"" # Set your desired AWS region
+}
+
+resource ""aws_nat_gateway"" ""pike"" {
+  subnet_id         = ""subnet-0562ef1d304b968f4""
+  allocation_id     = ""eipalloc-0047fa56c40637c3b""
+  connectivity_type = ""public""
+}","Has one ""aws_nat_gateway"" resource:
+Associated with a specified ""aws_subnet"" resource for hosting the NAT Gateway.
+Utilizes an ""Elastic IP allocation ID"" to provide the NAT Gateway with a public IP address.
+Configured for public connectivity, allowing resources within the private subnet to access the internet securely."
