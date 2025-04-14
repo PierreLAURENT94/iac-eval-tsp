@@ -26,3 +26,4 @@ util/datasets/__pycache__
 util/datasets/out/*.csv
 util/datasets/data.csv
 util/web/data/*.csv
+evaluation/run-adam.sh
