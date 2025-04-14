@@ -958,7 +958,7 @@ def main(
 
     # Setup environment variables:
     set_aws_credentials()
-    set_replicate_credentials()
+    # set_replicate_credentials()
     # set_huggingface_credentials()
 
     if "gemini-1.0-pro" in models:

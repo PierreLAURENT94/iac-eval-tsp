@@ -11,7 +11,7 @@ IaC-Eval also provides the first human-curated and challenging Infrastructure-as
 ## Installation
 
 1. Install Terraform (also [install AWS CLI and setup credentials](https://developer.hashicorp.com/terraform/tutorials/aws-get-started/aws-build#prerequisites))
-2. Install [Opa](https://www.openpolicyagent.org/docs/latest/#1-download-opa) (make sure to add opa to path).
+2. Install [Opa] 0.49.2 version(https://www.openpolicyagent.org/docs/latest/#1-download-opa) (make sure to add opa to path).
 3. <sup>*</sup>Obtain the following LLM model inference API keys as appropriate, depending on which of our currently supported models you want to perform evaluation on:
 - [OpenAI API token](https://platform.openai.com/docs/quickstart/account-setup): for GPT-3.5-Turbo and GPT-4
 - [Google API token](https://ai.google.dev/gemini-api/docs/quickstart?lang=python#set-up-api-key): for Gemini-1.0-Pro

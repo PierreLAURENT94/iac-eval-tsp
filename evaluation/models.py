@@ -341,7 +341,7 @@ def Ollama(preprompt, prompt, model):
     for i in range(2):
         try:
             response = requests.post(
-                "http://localhost:11434/api/generate",
+                "http://172.26.32.1:11434/api/generate",
                 json={
                     "model": model,
                     "prompt": prompt,
