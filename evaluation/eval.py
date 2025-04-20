@@ -554,7 +554,7 @@ def model_evaluation(
             for key, value in x.items():
                 logging.info(f"{key}: {value}")
 
-            if x["opa_evaluation_result"] == "success":
+            if x["opa_evaluation_result"] == "Success":
                 num_correct += 1
                 break
             elif PROMPT_ENHANCEMENT_STRAT == "multi-turn":
@@ -769,10 +769,31 @@ def OPA_Rego_evaluation(plan_file, policy_file):
                 capture_output=True,
                 text=True,
             )
-    except Exception as e:
-        opa_result = "OPA exception occurred."
-        opa_error = "OPA exception occurred: {}".format(e)
+        
+        opa_output = json.loads(result.stdout)
+
+        # Si la clé "result" n'est pas présente, alors on a une erreur de type ou autre
+        if "result" not in opa_output:
+            errors = opa_output.get("errors", "Unknown error")
+            return "Failure", f"OPA eval error: {json.dumps(errors, indent=2)}"
+
+        results = [
+            i[-1] for i in dict_generator(
+                opa_output["result"][0]["expressions"][0]["value"]
+            )
+        ]
+        success = False if False in results else True
+        opa_result = "Success" if success else "Failure"
+        opa_error = (
+            "No error"
+            if success
+            else f"OPA rule failed. Output: {json.dumps(opa_output, indent=2)}"
+        )
+
         return opa_result, opa_error
+        
+    except Exception as e:
+        return "OPA exception occurred.", f"OPA exception: {str(e)}"
 
     # check the exit code and return the result and error message
     # success = result.returncode == 0
@@ -780,23 +801,23 @@ def OPA_Rego_evaluation(plan_file, policy_file):
     # get the first key-value pair: https://stackoverflow.com/a/39292086/13336187
     # key_val = key_val[1]
     # print(key_val)
-    results = [
-        i[-1]
-        for i in dict_generator(
-            json.loads(result.stdout)["result"][0]["expressions"][0]["value"]
-        )
-    ]
+    # results = [
+    #     i[-1]
+    #     for i in dict_generator(
+    #         json.loads(result.stdout)["result"][0]["expressions"][0]["value"]
+    #     )
+    # ]
     # print(results)
     # print(key_val)
-    success = False if False in results else True
-    opa_result = "Success" if success else "Failure"
-    opa_error = "No error"
-    if not success:
-        opa_error = "Rule violation found. OPA complete output logged here: " + str(
-            json.loads(result.stdout)
-        )
-    # print("OPA error: ", opa_error)
-    return opa_result, opa_error
+    # success = False if False in results else True
+    # opa_result = "Success" if success else "Failure"
+    # opa_error = "No error"
+    # if not success:
+    #     opa_error = "Rule violation found. OPA complete output logged here: " + str(
+    #         json.loads(result.stdout)
+    #     )
+    # # print("OPA error: ", opa_error)
+    # return opa_result, opa_error
 
 
 def generate_terraform_plan_json(

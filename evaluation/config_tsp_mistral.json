@@ -1,0 +1,6 @@
+{
+  "samples": 1,
+  "models": [
+    "Ollama-mistral-small3.1:24b"
+  ]
+}

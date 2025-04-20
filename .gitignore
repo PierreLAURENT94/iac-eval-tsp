@@ -15,6 +15,7 @@ retriever/terraform-provider-aws/
 evaluation/tmp/rego_config/**/*
 evaluation/tmp/terraform_config/**/*
 evaluation/tmp/*
+evaluation/results/*
 evaluation/misc/complete-dataset-measurement/terraform_config/*
 evaluation/misc/complete-dataset-measurement/rego_config/*
 evaluation/misc/ablation/terraform_config/*
@@ -22,8 +23,10 @@ aws/*
 awscliv2.zip
 Miniconda3-latest-Linux-x86_64.sh
 opa
+util/*
 util/datasets/__pycache__
 util/datasets/out/*.csv
 util/datasets/data.csv
 util/web/data/*.csv
+local-dataset/*
 evaluation/run-adam.sh

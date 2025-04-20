@@ -5,7 +5,7 @@ import os
 
 # Importer le fichier CSV dans un DataFrame
 
-file_path = "data.csv"
+file_path = "data_en-niv1et2et3.csv"
 df = pd.read_csv(file_path)
 
 # Statistiques sur le DataFrame
@@ -16,8 +16,11 @@ print(f"[INFO] Nombre de défis avec une difficulté de 1 : {nb_difficulty_1}")
 nb_difficulty_2 = df[df["Difficulty"] == 2].shape[0]
 print(f"[INFO] Nombre de défis avec une difficulté de 2 : {nb_difficulty_2}")
 
-nb_difficulty_1et2 = nb_difficulty_1 + nb_difficulty_2
-print(f"[INFO] Nombre de défis avec une difficulté de 1 et 2 : {nb_difficulty_1et2}")
+nb_difficulty_3 = df[df["Difficulty"] == 3].shape[0]
+print(f"[INFO] Nombre de défis avec une difficulté de 3 : {nb_difficulty_3}")
+
+nb_difficulty_1et2et3 = nb_difficulty_1 + nb_difficulty_2 + nb_difficulty_3
+print(f"[INFO] Nombre de défis avec une difficulté de 1 et 2 et 3 : {nb_difficulty_1et2et3}")
 
 total_rows = df.shape[0]
 print(f"[INFO] Nombre total de défis : {total_rows}")
@@ -46,7 +49,7 @@ match choice:
         exit()
 
 # Filtrer uniquement les lignes avec une difficulté de 1 ou 2
-filtered_df = df[df["Difficulty"] <= 2]
+filtered_df = df[df["Difficulty"] <= 3]
 
 # Boucler sur les indices filtrés
 for index in tqdm(filtered_df.index, total=filtered_df.shape[0], desc="Progression"):
@@ -66,7 +69,7 @@ for index in tqdm(filtered_df.index, total=filtered_df.shape[0], desc="Progressi
                 print(f"Version courte : {filtered_df.loc[index, 'Prompt']}")
 
 # Sauvegarder le fichier filtré
-nom_fichier = "_" + mode + "-niv1et2.csv"
+nom_fichier = "_" + mode + "-niv1et2et3.csv"
 os.makedirs("out", exist_ok=True)
 
 filtered_df.to_csv("out/data" + nom_fichier, index=False, encoding="utf-8")

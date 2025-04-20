@@ -1,0 +1,6 @@
+{
+  "samples": 1,
+  "models": [
+    "Ollama-codegemma:7b"
+  ]
+}

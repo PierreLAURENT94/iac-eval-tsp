@@ -1,0 +1,6 @@
+{
+  "samples": 1,
+  "models": [
+    "Ollama-qwen2.5-coder:14b"
+  ]
+}

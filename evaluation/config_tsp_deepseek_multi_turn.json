@@ -1,0 +1,6 @@
+{
+  "samples": 1,
+  "models": [
+    "Ollama-deepseek-coder-v2:16b"
+  ]
+}

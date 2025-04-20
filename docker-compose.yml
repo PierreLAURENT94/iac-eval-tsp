@@ -1,0 +1,26 @@
+services:
+  iac-eval:
+    build: .
+    container_name: iac-eval
+    depends_on:
+      - ollama
+    environment:
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - AWS_ROLE_NAME=${AWS_ROLE_NAME}
+      - STRATEGY=${STRATEGY}
+      - MODEL_NAME=${MODEL_NAME}
+    entrypoint: ["/bin/bash", "/usr/local/bin/entrypoint-iac-eval.sh"]
+
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
+    volumes:
+      - ollama-data:/root/.ollama
+      - ./entrypoint-ollama.sh:/entrypoint-ollama.sh
+    environment:
+      - OLLAMA_MODEL=${MODEL_NAME}
+    entrypoint: ["/bin/bash", "/entrypoint-ollama.sh"]   
+
+volumes:
+  ollama-data:

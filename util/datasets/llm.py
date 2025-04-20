@@ -21,14 +21,14 @@ def to_french(prompt):
     )
 
     payload = {
-        "model": "alibayram/erurollm-9b-instruct",
-        "prompt": system_message + prompt,
-        "system": "",
+        "model": "gemma3:12b",
+        "prompt": prompt,
+        "system": system_message,
         "stream": False
     }
 
     try:
-        response = requests.post("http://localhost:11434/api/generate" , json=payload)
+        response = requests.post("http://172.26.32.1:11434/api/generate" , json=payload)
         if response.status_code == 200:
             return response.json().get("response")
     except requests.exceptions.ConnectionError:
@@ -52,14 +52,14 @@ def to_short(prompt):
     )
 
     payload = {
-        "model": "alibayram/erurollm-9b-instruct",
+        "model": "gemma3:12b",
         "prompt": system_message + prompt,
         "system": "",
         "stream": False
     }
 
     try:
-        response = requests.post("http://localhost:11434/api/generate" , json=payload)
+        response = requests.post("http://172.26.32.1:11434/api/generate" , json=payload)
         if response.status_code == 200:
             return response.json().get("response")
     except requests.exceptions.ConnectionError:
